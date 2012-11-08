@@ -36,8 +36,10 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
 
+import android.content.Intent;
 import android.hardware.SensorManager;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -58,15 +60,15 @@ public class Level1 extends SimpleBaseGameActivity implements
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
 	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
 
-	private ITexture buttonPlayTexture, projTexture, successTexture;
-	private ITextureRegion buttonPlayTextureRegion, projTextureRegion,
+	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
+	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
 			successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
 
 	private int mFaceCount = 0;
 
-	Sprite buttonPlay, success;
+	Sprite buttonPlay, success, buttonRestart;
 
 	AnimatedSprite asWb1, asWb2, asWb3;
 	Body bWb1, bWb2, bWb3;
@@ -108,6 +110,19 @@ public class Level1 extends SimpleBaseGameActivity implements
 			this.buttonPlayTexture.load();
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
+			
+			
+			this.buttonRestartTexture = new BitmapTexture(
+					this.getTextureManager(), new IInputStreamOpener() {
+						@Override
+						public InputStream open() throws IOException {
+							return getAssets().open("gfx/button_restart.png");
+						}
+					});
+
+			this.buttonRestartTexture.load();
+			this.buttonRestartTextureRegion = TextureRegionFactory
+					.extractFromTexture(this.buttonRestartTexture);
 			// ----
 			this.projTexture = new BitmapTexture(this.getTextureManager(),
 					new IInputStreamOpener() {
@@ -265,6 +280,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
+		
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
@@ -298,10 +314,17 @@ public class Level1 extends SimpleBaseGameActivity implements
 		// final Sprite buttonPlay = new Sprite(CAMERA_WIDTH-50, 50,
 		// this.buttonPlay, this.getVertexBufferObjectManager());
 		// mScene.attachChild(buttonPlay);
+		
+		
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
+		
+		buttonRestart = new Sprite(10, 10,
+				this.buttonRestartTextureRegion,
+				this.getVertexBufferObjectManager());
+		mScene.attachChild(buttonRestart);
 
 		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
@@ -392,7 +415,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-
+				
+				//play level
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
 					if (pSceneTouchEvent.getY() > 40
@@ -401,6 +425,17 @@ public class Level1 extends SimpleBaseGameActivity implements
 								SensorManager.GRAVITY_EARTH);
 						this.mPhysicsWorld.setGravity(gravity);
 						mScene.detachChild(buttonPlay);
+					}
+				}
+				
+				//restart level
+				if (pSceneTouchEvent.getX() > 10
+						&& pSceneTouchEvent.getX() < 82) {
+					if (pSceneTouchEvent.getY() > 10
+							&& pSceneTouchEvent.getY() < 82) {
+						Intent intent = getIntent();
+						finish();
+						startActivity(intent);
 					}
 				}
 
@@ -505,6 +540,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.disableAccelerationSensor();
 	}
 
+	
+	
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
