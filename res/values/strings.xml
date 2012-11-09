@@ -6,5 +6,7 @@
     <string name="title_activity_proto_v01">Proto_v01</string>
     <string name="title_activity_level1">Level1</string>
     <string name="title_activity_level2">Level2</string>
+    <string name="title_activity_level3">Level3</string>
+    <string name="title_activity_level4">Level4</string>
 
 </resources>
