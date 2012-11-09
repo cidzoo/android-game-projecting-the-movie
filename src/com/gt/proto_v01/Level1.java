@@ -111,7 +111,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
 			
-			
+			// Button Restart
 			this.buttonRestartTexture = new BitmapTexture(
 					this.getTextureManager(), new IInputStreamOpener() {
 						@Override

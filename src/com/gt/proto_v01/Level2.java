@@ -36,6 +36,7 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
 
+import android.content.Intent;
 import android.hardware.SensorManager;
 import android.util.Log;
 
@@ -58,15 +59,15 @@ public class Level2 extends SimpleBaseGameActivity implements
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
 	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
 
-	private ITexture buttonPlayTexture, projTexture, successTexture;
-	private ITextureRegion buttonPlayTextureRegion, projTextureRegion,
+	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
+	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
 			successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
 
 	private int mFaceCount = 0;
 
-	Sprite buttonPlay, success;
+	Sprite buttonPlay, success, buttonRestart;
 
 	AnimatedSprite asWb1, asWb2, asWb3;
 	Body bWb1, bWb2, bWb3;
@@ -108,6 +109,19 @@ public class Level2 extends SimpleBaseGameActivity implements
 			this.buttonPlayTexture.load();
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
+			
+			// Button Restart
+						this.buttonRestartTexture = new BitmapTexture(
+								this.getTextureManager(), new IInputStreamOpener() {
+									@Override
+									public InputStream open() throws IOException {
+										return getAssets().open("gfx/button_restart.png");
+									}
+								});
+
+						this.buttonRestartTexture.load();
+						this.buttonRestartTextureRegion = TextureRegionFactory
+								.extractFromTexture(this.buttonRestartTexture);
 			// ----
 			this.projTexture = new BitmapTexture(this.getTextureManager(),
 					new IInputStreamOpener() {
@@ -265,6 +279,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
+		
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
@@ -284,6 +299,11 @@ public class Level2 extends SimpleBaseGameActivity implements
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
+		
+		buttonRestart = new Sprite(10, 10,
+				this.buttonRestartTextureRegion,
+				this.getVertexBufferObjectManager());
+		mScene.attachChild(buttonRestart);
 
 		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
@@ -374,7 +394,8 @@ public class Level2 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-
+				
+				//play level
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
 					if (pSceneTouchEvent.getY() > 40
@@ -387,6 +408,16 @@ public class Level2 extends SimpleBaseGameActivity implements
 					}
 				}
 
+				//restart level
+				if (pSceneTouchEvent.getX() > 10
+						&& pSceneTouchEvent.getX() < 82) {
+					if (pSceneTouchEvent.getY() > 10
+							&& pSceneTouchEvent.getY() < 82) {
+						Intent intent = getIntent();
+						finish();
+						startActivity(intent);
+					}
+				}
 				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
 				// + " and Y is " + pSceneTouchEvent.getY());
 				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
