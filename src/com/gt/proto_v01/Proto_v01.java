@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 public class Proto_v01 extends Activity {
 	
-	Button lvl1, lvl2, lvl3, lvl4;
+	Button lvl1, lvl2, lvl3, lvl4, lvl5;
 	TextView tv1,tv2;
 	LayoutInflater linflater;
     LinearLayout l;
@@ -48,6 +48,11 @@ public class Proto_v01 extends Activity {
         lvl4.setText("Level 4");
         lvl4.setOnClickListener(new lvl4Listener());
         l.addView(lvl4);
+        
+        lvl5 = new Button(this);
+        lvl5.setText("Level 5");
+        lvl5.setOnClickListener(new lvl5Listener());
+        l.addView(lvl5);
         
         setContentView(l);
     }
@@ -90,6 +95,15 @@ public class Proto_v01 extends Activity {
         public void onClick(View v) {
             tv1.setText("Launching level 4...");
             Intent intent = new Intent(v.getContext(), Level4.class);
+            startActivity(intent);
+        }
+    }
+    
+    class lvl5Listener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            tv1.setText("Launching level 5...");
+            Intent intent = new Intent(v.getContext(), Level5.class);
             startActivity(intent);
         }
     }
