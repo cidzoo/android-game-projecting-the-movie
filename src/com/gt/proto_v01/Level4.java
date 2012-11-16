@@ -59,12 +59,12 @@ public class Level4 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas, chairBitmapTextureAtlas;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, chairTextureRegion;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
 	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
@@ -76,8 +76,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 	Sprite buttonPlay, success, buttonRestart;
 
-	AnimatedSprite asWb1, asWb2, asWb3;
-	Body bWb1, bWb2, bWb3;
+	AnimatedSprite asWb1, asWb2, asWb3, asChair;
+	Body bWb1, bWb2, bWb3, bChair;
 	float xWb1, xWb2, xWb3, yWb1, yWb2, yWb3;
 	float wb1Angle, wb2Angle, wb3Angle;
 
@@ -92,6 +92,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
+	boolean wasOnMovePointChair = false;
+	boolean wasOnRotatePointChair = false;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -167,6 +169,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		
+		this.chairBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),100 , 122, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -179,10 +183,14 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
+	
+		this.chairTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.chairBitmapTextureAtlas, this, "chair_100x122px.png",0,0,1,1);
 
 		this.woodboardBitmapTextureAtlas.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
+		
+		this.chairBitmapTextureAtlas.load();
 
 	}
 
@@ -337,8 +345,9 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 		// *********************
 		// ** WOOD BOARDS ***//
+		//**********************
 
-		asWb1 = new AnimatedSprite(50, CAMERA_HEIGHT - 30,
+		asWb1 = new AnimatedSprite(250, CAMERA_HEIGHT - 15,
 				this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
 		// asWb1.setScale(MathUtils.random(0.5f, 1.25f));
@@ -371,7 +380,17 @@ public class Level4 extends SimpleBaseGameActivity implements
 				bWb3, true, true));
 		wb3Angle = (float) 0.15;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
-
+		
+		// *********************
+		// ****** CHAIR *******
+		//*********************
+		
+		asChair = new AnimatedSprite(50, CAMERA_HEIGHT - 130, this.chairTextureRegion, this.getVertexBufferObjectManager());
+		bChair = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asChair, BodyType.KinematicBody, objectFixtureDef);
+		this.mScene.attachChild(asChair);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asChair, bChair, true, true));
+		
+		
 		return this.mScene;
 	}
 
@@ -422,6 +441,27 @@ public class Level4 extends SimpleBaseGameActivity implements
 					}
 				}
 				
+				x = asChair.getX();
+				y = asChair.getY();
+				xW = asChair.getWidth();
+				yW = asChair.getHeight();
+				if (pSceneTouchEvent.getX() < x + xW + 20
+						&& pSceneTouchEvent.getX() > x + xW - 30) {
+					if (pSceneTouchEvent.getY() > y - 20
+							&& pSceneTouchEvent.getY() < y + yW + 20) {
+						yOnTouchDown = pSceneTouchEvent.getY();
+						wasOnRotatePointChair = true;
+					}
+				} else {
+					if (pSceneTouchEvent.getX() > x + 30
+							&& pSceneTouchEvent.getX() < x + xW - 30) {
+						if (pSceneTouchEvent.getY() > y - 20
+								&& pSceneTouchEvent.getY() < y + yW + 20) {
+							wasOnMovePointChair = true;
+						}
+					}
+				}
+				
 				//play level
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
@@ -467,13 +507,13 @@ public class Level4 extends SimpleBaseGameActivity implements
 					xW = asWb1.getWidth();
 					yW = asWb1.getHeight();
 					if (wasOnMovePointWb1){
-							bWb1.setTransform(
-									pSceneTouchEvent.getX()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									pSceneTouchEvent.getY()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									bWb1.getAngle());
-						
+						bWb1.setTransform(
+								pSceneTouchEvent.getX()
+								/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+								pSceneTouchEvent.getY()
+								/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+								bWb1.getAngle());
+
 					} else {
 
 						if (wasOnRotatePointWb1) {
@@ -485,19 +525,32 @@ public class Level4 extends SimpleBaseGameActivity implements
 							if (wasOnMovePointWb2){
 								bWb2.setTransform(
 										pSceneTouchEvent.getX()
-												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										pSceneTouchEvent.getY()
-												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										bWb2.getAngle());
-							
-						} else {
 
-							if (wasOnRotatePointWb2) {
-								angle = pSceneTouchEvent.getY() - yOnTouchDown;
-								bWb2.setTransform(bWb2.getPosition(), angle / 100);
+							} else {
 
+								if (wasOnRotatePointWb2) {
+									angle = pSceneTouchEvent.getY() - yOnTouchDown;
+									bWb2.setTransform(bWb2.getPosition(), angle / 100);
+
+								} else{
+									
+									if (wasOnMovePointChair){
+										bChair.setTransform(pSceneTouchEvent.getX() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+												pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, bChair.getAngle());
+										
+									} else{
+										
+										if (wasOnRotatePointChair){
+											angle = pSceneTouchEvent.getY() - yOnTouchDown;
+											bChair.setTransform(bChair.getPosition(), angle / 100);
+										}
+									}
+								}
 							}
-						}
 						}
 					}
 					// Log.d("myFlags", "yOnTouchDown and gety : " +
@@ -510,6 +563,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 						wasOnMovePointWb1 = false;
 						wasOnRotatePointWb2 = false;
 						wasOnMovePointWb2 = false;
+						wasOnRotatePointChair = false;
+						wasOnMovePointChair = false;
 					}
 				}
 			}
