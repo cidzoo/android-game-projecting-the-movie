@@ -103,8 +103,8 @@ public class Proto_v01 extends Activity {
         @Override
         public void onClick(View v) {
             tv1.setText("Launching level 5...");
-            Intent intent = new Intent(v.getContext(), Level5.class);
-            startActivity(intent);
+            //Intent intent = new Intent(v.getContext(), Level5.class);
+            //startActivity(intent);
         }
     }
 }

@@ -9,6 +9,17 @@ import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.andengine.entity.particle.SpriteParticleSystem;
+import org.andengine.entity.particle.emitter.CircleOutlineParticleEmitter;
+import org.andengine.entity.particle.initializer.AlphaParticleInitializer;
+import org.andengine.entity.particle.initializer.BlendFunctionParticleInitializer;
+import org.andengine.entity.particle.initializer.ColorParticleInitializer;
+import org.andengine.entity.particle.initializer.RotationParticleInitializer;
+import org.andengine.entity.particle.initializer.VelocityParticleInitializer;
+import org.andengine.entity.particle.modifier.AlphaParticleModifier;
+import org.andengine.entity.particle.modifier.ColorParticleModifier;
+import org.andengine.entity.particle.modifier.ExpireParticleInitializer;
+import org.andengine.entity.particle.modifier.ScaleParticleModifier;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
@@ -38,6 +49,7 @@ import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.opengl.GLES20;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -46,11 +58,11 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 
-	//===========================================================
-	// Level3.java - Projet Game Tech - HES-SO Master
-	// 
-	// Niveau de Valentin (démo téléporteur)
-	// ===========================================================
+//===========================================================
+// Level3.java - Projet Game Tech - HES-SO Master
+// 
+// Niveau de Valentin (démo téléporteur)
+// ===========================================================
 
 public class Level3 extends SimpleBaseGameActivity implements
 		IAccelerationListener, IOnSceneTouchListener {
@@ -58,26 +70,54 @@ public class Level3 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_WIDTH = 800;
 	protected static final int CAMERA_HEIGHT = 480;
 
-	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas;
+	// /* The categories. */
+	// public static final short CATEGORYBIT_WALL = 1;
+	// public static final short CATEGORYBIT_BOBINE = 2;
+	// public static final short CATEGORYBIT_DEMATERIALISEUR = 4;
+	//
+	// /* And what should collide with what. */
+	// public static final short MASKBITS_WALL = CATEGORYBIT_WALL +
+	// CATEGORYBIT_BOBINE + CATEGORYBIT_DEMATERIALISEUR;
+	// public static final short MASKBITS_BOBINE = CATEGORYBIT_WALL; // Missing:
+	// CATEGORYBIT_CIRCLE
+	// public static final short MASKBITS_DEMATERIALISEUR = CATEGORYBIT_WALL +
+	// CATEGORYBIT_DEMATERIALISEUR; // Missing: CATEGORYBIT_BOX
+	//
+	// public static final FixtureDef WALL_FIXTURE_DEF =
+	// PhysicsFactory.createFixtureDef(0, 0.5f, 0.5f, false, CATEGORYBIT_WALL,
+	// MASKBITS_WALL, (short)0);
+	// public static final FixtureDef BOBINE_FIXTURE_DEF =
+	// PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f, false, CATEGORYBIT_BOBINE,
+	// MASKBITS_BOBINE, (short)0);
+	// public static final FixtureDef DEMATERIALISEUR_FIXTURE_DEF =
+	// PhysicsFactory.createFixtureDef(1, 0.5f, 0.5f, false,
+	// CATEGORYBIT_DEMATERIALISEUR, MASKBITS_DEMATERIALISEUR, (short)0);
 
+	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
+			laserBitmapTextureAtlas, teleporteurBitmapTextureAtlas,
+			mFireTextureAtlas;
+
+	private ITextureRegion mParticleTextureRegion;
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion,
+			dematerialiseurTextureRegion;
+	
+	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture,
+			laserTexture;
 
-	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
 	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
-			successTextureRegion;
+			laserTextureRegion, successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	private int mFaceCount = 0;
+	Sprite buttonPlay, success, laser;
 
-	Sprite buttonPlay, success, buttonRestart;
+	AnimatedSprite asTeleporteur1, asTeleporteur2;
 
-	AnimatedSprite asWb1, asWb2, asWb3;
-	Body bWb1, bWb2, bWb3;
+	Body bTeleporteur1, bTeleporteur2;
+
 	float xWb1, xWb2, xWb3, yWb1, yWb2, yWb3;
 	float wb1Angle, wb2Angle, wb3Angle;
 
@@ -85,14 +125,12 @@ public class Level3 extends SimpleBaseGameActivity implements
 	Body bBobine;
 
 	boolean levelDone = false;
-
 	float yOnTouchDown = 0;
-
 	boolean wasOnRotatePointWb1 = false;
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
-	
+
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 
@@ -107,6 +145,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 		try {
 			this.buttonPlayTexture = new BitmapTexture(
 					this.getTextureManager(), new IInputStreamOpener() {
+
 						@Override
 						public InputStream open() throws IOException {
 							return getAssets().open("gfx/button_play.png");
@@ -116,22 +155,10 @@ public class Level3 extends SimpleBaseGameActivity implements
 			this.buttonPlayTexture.load();
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
-			
-			// Button Restart
-			this.buttonRestartTexture = new BitmapTexture(
-					this.getTextureManager(), new IInputStreamOpener() {
-						@Override
-						public InputStream open() throws IOException {
-							return getAssets().open("gfx/button_restart.png");
-						}
-					});
-
-			this.buttonRestartTexture.load();
-			this.buttonRestartTextureRegion = TextureRegionFactory
-					.extractFromTexture(this.buttonRestartTexture);
 			// ----
 			this.projTexture = new BitmapTexture(this.getTextureManager(),
 					new IInputStreamOpener() {
+
 						@Override
 						public InputStream open() throws IOException {
 							return getAssets().open("gfx/proj3.png");
@@ -142,8 +169,24 @@ public class Level3 extends SimpleBaseGameActivity implements
 			this.projTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.projTexture);
 			// ---
+
+			// --- laser
+			this.laserTexture = new BitmapTexture(this.getTextureManager(),
+					new IInputStreamOpener() {
+
+						@Override
+						public InputStream open() throws IOException {
+							return getAssets().open("gfx/laser.png");
+						}
+					});
+
+			this.laserTexture.load();
+			this.laserTextureRegion = TextureRegionFactory
+					.extractFromTexture(this.laserTexture);
+
 			this.successTexture = new BitmapTexture(this.getTextureManager(),
 					new IInputStreamOpener() {
+
 						@Override
 						public InputStream open() throws IOException {
 							return getAssets().open("gfx/success.png");
@@ -165,8 +208,18 @@ public class Level3 extends SimpleBaseGameActivity implements
 		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
 
-		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
-				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		this.laserBitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 800, 47, TextureOptions.BILINEAR);
+
+		this.teleporteurBitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 180, 33, TextureOptions.BILINEAR);
+
+		this.mFireTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 32, 32,
+				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mParticleTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createFromAsset(this.mBitmapTextureAtlas, this,
+						"particle_point.png", 0, 0);
 
 		// --------
 
@@ -175,14 +228,20 @@ public class Level3 extends SimpleBaseGameActivity implements
 						"bobine3.png", 0, 0, 1, 1); // 64x32
 		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.bgBitmapTextureAtlas, this,
-						"bgRideau.png", 0, 0, 1, 1); // 64x32
-		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
-						"woodboard.png", 0, 0, 1, 1);
+						"fond_scienceFiction.png", 0, 0, 1, 1); // 64x32
+		this.laserTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.laserBitmapTextureAtlas, this,
+						"laser.png", 0, 0, 1, 1);
+		this.dematerialiseurTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.teleporteurBitmapTextureAtlas, this,
+						"dematerialiseur.png", 0, 0, 1, 1);
 
-		this.woodboardBitmapTextureAtlas.load();
+		this.laserBitmapTextureAtlas.load();
+		this.teleporteurBitmapTextureAtlas.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
+		this.mBitmapTextureAtlas.load();
+		this.mFireTextureAtlas.load();
 
 	}
 
@@ -193,8 +252,16 @@ public class Level3 extends SimpleBaseGameActivity implements
 
 		this.mScene = new Scene();
 
+		final CircleOutlineParticleEmitter particleEmitter = new CircleOutlineParticleEmitter(
+				Level3.CAMERA_WIDTH * 0.5f, Level3.CAMERA_HEIGHT * 0.5f + 20,
+				80);
+		final SpriteParticleSystem particleSystem = new SpriteParticleSystem(
+				particleEmitter, 60, 60, 360, this.mParticleTextureRegion,
+				this.getVertexBufferObjectManager());
+
 		mScene.registerUpdateHandler(new TimerHandler(0.1f, true,
 				new ITimerCallback() {
+
 					@Override
 					public void onTimePassed(final TimerHandler pTimerHandler) {
 						if (!levelDone) {
@@ -209,9 +276,72 @@ public class Level3 extends SimpleBaseGameActivity implements
 									mPhysicsWorld.setGravity(gravity);
 								}
 							}
+							if (asBobine.collidesWith(laser)) {
+								mScene.detachChild(asBobine);
+								particleSystem.detachSelf();
+								mScene.attachChild(particleSystem);
+								particleEmitter.setCenter(asBobine.getX(),
+										asBobine.getY() - 20);
+
+								mScene.registerUpdateHandler(new TimerHandler(
+										4f, new ITimerCallback() {
+
+											@Override
+											public void onTimePassed(
+													final TimerHandler pTimerHandler) {
+												particleSystem
+														.setParticlesSpawnEnabled(false);
+												mScene.unregisterUpdateHandler(pTimerHandler);
+											}
+										}));
+								mScene.registerUpdateHandler(new TimerHandler(
+										2f, new ITimerCallback() {
+
+											@Override
+											public void onTimePassed(
+													final TimerHandler pTimerHandler) {
+												particleSystem
+														.setParticlesSpawnEnabled(false);
+												mScene.unregisterUpdateHandler(pTimerHandler);
+											}
+										}));
+							}
+							if (asBobine.collidesWith(asTeleporteur1)) {
+								Log.i("contact", "avec 1");
+								Log.i("x bobine", "" + asBobine.getX());
+								Log.i("x dematerialiseur",
+										"" + asTeleporteur1.getX());
+								Log.i("degré démat",
+										"" + asTeleporteur1.getRotation());
+								// if(asBobine.getX() >
+								// asDematerialiseur1.getX()){
+								Log.i("touche", "touche");
+								// bBobine.setAngularVelocity((float)(Math.PI*(asTeleporteur2.getRotation()/180))*-1);
+								// bBobine.setAngularDamping((float)(Math.PI*(asTeleporteur2.getRotation()/180))*-1);
+								// asBobine.setRotation(45f);
+								bBobine.setTransform(new Vector2(
+										(asTeleporteur2.getX() + 90.0f) / 32,
+										(asTeleporteur2.getY() + 50.0f) / 32),
+										0);
+								// bBobine.setTransform(new Vector2(13.5f,
+								// 11.2f), -1.57f);
+								// bBobine.setTransform(new Vector2(13.5f,
+								// 11.2f), 1.57f);
+								// bBobine.applyAngularImpulse(0.76f);
+								Log.i("x", "" + (asTeleporteur2.getX() + 90.0f)
+										/ 32);
+								Log.i("y", "" + (asTeleporteur2.getY() + 50.0f)
+										/ 32);
+
+								Log.i("angle teleporteur radian : ",
+										""
+												+ (float) (Math.PI * (asTeleporteur2
+														.getRotation() / 180))
+												* -1);
+							}
+
 						}
 					}
-
 				}));
 		final VertexBufferObjectManager vertexBufferObjectManager = this
 				.getVertexBufferObjectManager();
@@ -264,6 +394,11 @@ public class Level3 extends SimpleBaseGameActivity implements
 				this.projTextureRegion, this.getVertexBufferObjectManager());
 		mScene.attachChild(proj);
 
+		// laser
+		laser = new Sprite(0, CAMERA_HEIGHT - 300, this.laserTextureRegion,
+				this.getVertexBufferObjectManager());
+		mScene.attachChild(laser);
+
 		// projbody
 		final Rectangle projr1 = new Rectangle(CAMERA_WIDTH - 173,
 				CAMERA_HEIGHT - 54, 40, 2, vertexBufferObjectManager);
@@ -286,7 +421,6 @@ public class Level3 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
-		
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
@@ -296,81 +430,68 @@ public class Level3 extends SimpleBaseGameActivity implements
 				this.getVertexBufferObjectManager());
 		// face.setScale(MathUtils.random(0.5f, 1.25f));
 		bBobine = PhysicsFactory.createCircleBody(this.mPhysicsWorld, asBobine,
-				BodyType.DynamicBody,
-				PhysicsFactory.createFixtureDef(1, 0, 0.5f));
+				BodyType.DynamicBody, objectFixtureDef);
 
 		this.mScene.attachChild(asBobine);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
 		// ---
-		// final AnimatedSprite asButtonPlay;
-		// final Body bButtonPlay;
-		// asButtonPlay = new AnimatedSprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay,
-		// this.getVertexBufferObjectManager());
-		// // face.setScale(MathUtils.random(0.5f, 1.25f));
-		// bButtonPlay = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
-		// asButtonPlay,
-		// BodyType.StaticBody, objectFixtureDef);
-		// this.mScene.attachChild(asButtonPlay);
-		// this.mPhysicsWorld.registerPhysicsConnector(new
-		// PhysicsConnector(asButtonPlay,
-		// bButtonPlay, true, true));
-
-		// final Sprite buttonPlay = new Sprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay, this.getVertexBufferObjectManager());
-		// mScene.attachChild(buttonPlay);
-		
-		
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
-		
-		buttonRestart = new Sprite(10, 10,
-				this.buttonRestartTextureRegion,
-				this.getVertexBufferObjectManager());
-		mScene.attachChild(buttonRestart);
 
 		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
 
 		// *********************
-		// ** WOOD BOARDS ***//
+		// ** TELEPORTEURS ***//
 
-		asWb1 = new AnimatedSprite(50, CAMERA_HEIGHT - 30,
-				this.woodboardTextureRegion,
+		asTeleporteur1 = new AnimatedSprite(50, CAMERA_HEIGHT - 30,
+				this.dematerialiseurTextureRegion,
 				this.getVertexBufferObjectManager());
-		// asWb1.setScale(MathUtils.random(0.5f, 1.25f));
-		bWb1 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb1,
-				BodyType.KinematicBody, objectFixtureDef);
-		this.mScene.attachChild(asWb1);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb1,
-				bWb1, true, true));
-		// wb1Angle = (float) 0.17;
-		// bWb1.setTransform(bWb1.getPosition(), wb1Angle);
+		bTeleporteur1 = PhysicsFactory.createBoxBody(this.mPhysicsWorld,
+				asTeleporteur1, BodyType.KinematicBody, objectFixtureDef);
+		this.mScene.attachChild(asTeleporteur1);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				asTeleporteur1, bTeleporteur1, true, true));
 
-		asWb2 = new AnimatedSprite(250, CAMERA_HEIGHT - 30, this.woodboardTextureRegion,
+		asTeleporteur2 = new AnimatedSprite(250, CAMERA_HEIGHT - 30,
+				this.dematerialiseurTextureRegion,
 				this.getVertexBufferObjectManager());
-		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
-		bWb2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb2,
-				BodyType.KinematicBody, objectFixtureDef);
-		this.mScene.attachChild(asWb2);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb2,
-				bWb2, true, true));
-//		wb2Angle = (float) 0.17;
-//		bWb2.setTransform(bWb2.getPosition(), wb2Angle);
+		bTeleporteur2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld,
+				asTeleporteur2, BodyType.KinematicBody, objectFixtureDef);
+		this.mScene.attachChild(asTeleporteur2);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				asTeleporteur2, bTeleporteur2, true, true));
 
-		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion,
-				this.getVertexBufferObjectManager());
-		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
-		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
-				BodyType.KinematicBody, objectFixtureDef);
-		this.mScene.attachChild(asWb3);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
-				bWb3, true, true));
-		wb3Angle = (float) 0.37;
-		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
+		particleSystem
+				.addParticleInitializer(new ColorParticleInitializer<Sprite>(1,
+						0, 0));
+		particleSystem
+				.addParticleInitializer(new AlphaParticleInitializer<Sprite>(0));
+		particleSystem
+				.addParticleInitializer(new BlendFunctionParticleInitializer<Sprite>(
+						GLES20.GL_SRC_ALPHA, GLES20.GL_ONE));
+		particleSystem
+				.addParticleInitializer(new VelocityParticleInitializer<Sprite>(
+						-2, 2, -20, -10));
+		particleSystem
+				.addParticleInitializer(new RotationParticleInitializer<Sprite>(
+						0.0f, 360.0f));
+		particleSystem
+				.addParticleInitializer(new ExpireParticleInitializer<Sprite>(6));
+
+		particleSystem.addParticleModifier(new ScaleParticleModifier<Sprite>(0,
+				5, 1.0f, 2.0f));
+		particleSystem.addParticleModifier(new ColorParticleModifier<Sprite>(0,
+				3, 1, 1, 0, 0.5f, 0, 0));
+		particleSystem.addParticleModifier(new ColorParticleModifier<Sprite>(4,
+				6, 1, 1, 0.5f, 1, 0, 1));
+		particleSystem.addParticleModifier(new AlphaParticleModifier<Sprite>(0,
+				1, 0, 1));
+		particleSystem.addParticleModifier(new AlphaParticleModifier<Sprite>(5,
+				6, 1, 0));
 
 		return this.mScene;
 	}
@@ -381,10 +502,10 @@ public class Level3 extends SimpleBaseGameActivity implements
 		if (this.mPhysicsWorld != null) {
 			if (pSceneTouchEvent.isActionDown()) {
 				float x, y, xW, yW;
-				x = asWb1.getX();
-				y = asWb1.getY();
-				xW = asWb1.getWidth();
-				yW = asWb1.getHeight();
+				x = asTeleporteur1.getX();
+				y = asTeleporteur1.getY();
+				xW = asTeleporteur1.getWidth();
+				yW = asTeleporteur1.getHeight();
 				if (pSceneTouchEvent.getX() < x + xW + 20
 						&& pSceneTouchEvent.getX() > x + xW - 30) {
 					if (pSceneTouchEvent.getY() > y - 20
@@ -401,10 +522,10 @@ public class Level3 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-				x = asWb2.getX();
-				y = asWb2.getY();
-				xW = asWb2.getWidth();
-				yW = asWb2.getHeight();
+				x = asTeleporteur2.getX();
+				y = asTeleporteur2.getY();
+				xW = asTeleporteur2.getWidth();
+				yW = asTeleporteur2.getHeight();
 				if (pSceneTouchEvent.getX() < x + xW + 20
 						&& pSceneTouchEvent.getX() > x + xW - 30) {
 					if (pSceneTouchEvent.getY() > y - 20
@@ -421,8 +542,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-				
-				//play level
+
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
 					if (pSceneTouchEvent.getY() > 40
@@ -430,80 +550,64 @@ public class Level3 extends SimpleBaseGameActivity implements
 						Vector2 gravity = new Vector2(0,
 								SensorManager.GRAVITY_EARTH);
 						this.mPhysicsWorld.setGravity(gravity);
+						bBobine.setType(BodyType.DynamicBody);
+						Vector2 vector = bBobine.getLinearVelocity();
+						Log.i("Acceleration", "" + vector.y);
+						bBobine.setLinearVelocity(vector.x, vector.y + 20); // Permet
+																			// de
+																			// définir
+																			// la
+																			// vitesse
+																			// de
+																			// la
+																			// bobine
 						mScene.detachChild(buttonPlay);
 					}
 				}
-				
-				//restart level
-				if (pSceneTouchEvent.getX() > 10
-						&& pSceneTouchEvent.getX() < 82) {
-					if (pSceneTouchEvent.getY() > 10
-							&& pSceneTouchEvent.getY() < 82) {
-						Intent intent = getIntent();
-						finish();
-						startActivity(intent);
-					}
-				}
-
-				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
-				// + " and Y is " + pSceneTouchEvent.getY());
-				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
-				// " "
-				// + bBobine.getPosition().y);
-				// Log.d("myFlags", "sprite coord : " + asBobine.getX() + " "
-				// + asBobine.getY());
-				// Log.d("myFlags", "sprite to body coord : " + asBobine.getX()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT + " "
-				// + asBobine.getY()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
 
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove()) {
 					float angle = 0;
-					float x, y, xW, yW;
-					x = asWb1.getX();
-					y = asWb1.getY();
-					xW = asWb1.getWidth();
-					yW = asWb1.getHeight();
-					if (wasOnMovePointWb1){
-							bWb1.setTransform(
-									pSceneTouchEvent.getX()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									pSceneTouchEvent.getY()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									bWb1.getAngle());
-						
-					} else {
-
-						if (wasOnRotatePointWb1) {
-							angle = pSceneTouchEvent.getY() - yOnTouchDown;
-							bWb1.setTransform(bWb1.getPosition(), angle / 100);
-
-						}
-						else{
-							if (wasOnMovePointWb2){
-								bWb2.setTransform(
+					if (wasOnMovePointWb1) {
+						bTeleporteur1
+								.setTransform(
 										pSceneTouchEvent.getX()
 												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										pSceneTouchEvent.getY()
 												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-										bWb2.getAngle());
-							
+										bTeleporteur1.getAngle());
+
+					} else {
+
+						if (wasOnRotatePointWb1) {
+							angle = pSceneTouchEvent.getY() - yOnTouchDown;
+							bTeleporteur1.setTransform(
+									bTeleporteur1.getPosition(), angle / 100);
+
 						} else {
+							if (wasOnMovePointWb2) {
+								bTeleporteur2
+										.setTransform(
+												pSceneTouchEvent.getX()
+														/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+												pSceneTouchEvent.getY()
+														/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+												bTeleporteur2.getAngle());
 
-							if (wasOnRotatePointWb2) {
-								angle = pSceneTouchEvent.getY() - yOnTouchDown;
-								bWb2.setTransform(bWb2.getPosition(), angle / 100);
+							} else {
 
+								if (wasOnRotatePointWb2) {
+									angle = pSceneTouchEvent.getY()
+											- yOnTouchDown;
+									bTeleporteur2.setTransform(
+											bTeleporteur2.getPosition(),
+											angle / 100);
+
+								}
 							}
 						}
-						}
 					}
-					// Log.d("myFlags", "yOnTouchDown and gety : " +
-					// yOnTouchDown
-					// + " " + pSceneTouchEvent.getY());
-					// Log.d("myFlags", "angle" + angle);
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;
@@ -521,7 +625,6 @@ public class Level3 extends SimpleBaseGameActivity implements
 	@Override
 	public void onAccelerationAccuracyChanged(
 			final AccelerationData pAccelerationData) {
-
 	}
 
 	@Override
@@ -545,9 +648,6 @@ public class Level3 extends SimpleBaseGameActivity implements
 
 		this.disableAccelerationSensor();
 	}
-
-	
-	
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
