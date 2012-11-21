@@ -112,7 +112,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	Sprite buttonPlay, success, laser;
+	Sprite buttonPlay, success, laser, buttonRestart;
 
 	AnimatedSprite asTeleporteur1, asTeleporteur2;
 
@@ -155,6 +155,20 @@ public class Level3 extends SimpleBaseGameActivity implements
 			this.buttonPlayTexture.load();
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
+			
+			// Button Restart
+			this.buttonRestartTexture = new BitmapTexture(
+					this.getTextureManager(), new IInputStreamOpener() {
+						@Override
+						public InputStream open() throws IOException {
+							return getAssets().open("gfx/button_restart.png");
+						}
+					});
+
+			this.buttonRestartTexture.load();
+			this.buttonRestartTextureRegion = TextureRegionFactory
+					.extractFromTexture(this.buttonRestartTexture);
+			
 			// ----
 			this.projTexture = new BitmapTexture(this.getTextureManager(),
 					new IInputStreamOpener() {
@@ -441,6 +455,11 @@ public class Level3 extends SimpleBaseGameActivity implements
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
 
+		buttonRestart = new Sprite(10, 10,
+				this.buttonRestartTextureRegion,
+				this.getVertexBufferObjectManager());
+		mScene.attachChild(buttonRestart);
+		
 		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
 
@@ -562,6 +581,17 @@ public class Level3 extends SimpleBaseGameActivity implements
 																			// la
 																			// bobine
 						mScene.detachChild(buttonPlay);
+					}
+				}
+				
+				//restart level
+				if (pSceneTouchEvent.getX() > 10
+						&& pSceneTouchEvent.getX() < 82) {
+					if (pSceneTouchEvent.getY() > 10
+							&& pSceneTouchEvent.getY() < 82) {
+						Intent intent = getIntent();
+						finish();
+						startActivity(intent);
 					}
 				}
 
