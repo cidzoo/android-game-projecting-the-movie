@@ -1,122 +1,119 @@
 package com.gt.proto_v01;
 
-import android.app.Activity;
+import org.andengine.engine.camera.Camera;
+import org.andengine.engine.options.EngineOptions;
+import org.andengine.engine.options.ScreenOrientation;
+import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.andengine.entity.scene.Scene;
+import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.util.FPSLogger;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
+import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSource;
+import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
+import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
+import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.ui.activity.SimpleBaseGameActivity;
+import org.andengine.util.debug.Debug;
+
 import android.content.Intent;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 
 
-public class Proto_v01 extends Activity {
+public class Proto_v01 extends SimpleBaseGameActivity {
 	
-	Button lvl1, lvl2, lvl3, lvl4, lvl5;
-	TextView tv1,tv2;
-	LayoutInflater linflater;
-    LinearLayout l;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        l = new LinearLayout(this);
-        l.setOrientation(LinearLayout.VERTICAL); 
-        
-        tv1 = new TextView(this);
-        tv1.setText("Choose a level");
-        l.addView(tv1);
-        
-        lvl1 = new Button(this);
-        lvl1.setText("Level 1");
-        lvl1.setOnClickListener(new lvl1Listener());
-        l.addView(lvl1);
-        
-        lvl2 = new Button(this);
-        lvl2.setText("Level 2");
-        lvl2.setOnClickListener(new lvl2Listener());
-        l.addView(lvl2);
-        
-        lvl3 = new Button(this);
-        lvl3.setText("Level 3");
-        lvl3.setOnClickListener(new lvl3Listener());
-        l.addView(lvl3);
-        
-        lvl4 = new Button(this);
-        lvl4.setText("Level 4");
-        lvl4.setOnClickListener(new lvl4Listener());
-        l.addView(lvl4);
-        
-        lvl5 = new Button(this);
-        lvl5.setText("Level 5");
-        lvl5.setOnClickListener(new lvl5Listener());
-        l.addView(lvl5);
-        
-        setContentView(l);
-    }
+	// ===========================================================
+	// Constants
+	// ===========================================================
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_proto_v01, menu);
-        return true;
-    }
-    
-    class lvl1Listener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            tv1.setText("Launching level 1...");
-            Intent intent = new Intent(v.getContext(), Level1.class);
-            startActivity(intent);
-        }
-    }
-    
-    class lvl2Listener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            tv1.setText("Launching level 2...");
-            Intent intent = new Intent(v.getContext(), Level2.class);
-            startActivity(intent);
-        }
-    }
-    
-    class lvl3Listener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            tv1.setText("Launching level 3...");
-            Intent intent = new Intent(v.getContext(), Level3.class);
-            startActivity(intent);
-        }
-    }
-    
-    class lvl4Listener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            tv1.setText("Launching level 4...");
-            Intent intent = new Intent(v.getContext(), Level4.class);
-            startActivity(intent);
-        }
-    }
-    
-    class lvl5Listener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            tv1.setText("Launching level 5...");
-            //Intent intent = new Intent(v.getContext(), Level5.class);
-            //startActivity(intent);
-        }
-    }
+	public static final int CAMERA_WIDTH = 800;
+	public static final int CAMERA_HEIGHT = 480;
+
+	// ===========================================================
+	// Fields
+	// ===========================================================
+
+	public BuildableBitmapTextureAtlas bmpTextureAtlas;
+	
+	private ITextureRegion buttonSlideTextureRegion1;
+	private ITextureRegion buttonSlideTextureRegion2;
+	private ITextureRegion buttonSlideTextureRegion3;
+	private ITextureRegion buttonSlideTextureRegion4;
+	private ITextureRegion buttonSlideTextureRegion5;
+	
+	private MenuSlider menuSlider;
+	
+
+	public EngineOptions onCreateEngineOptions() {
+		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+
+		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+		return engineOptions;
+	}
+
+	@Override
+	protected void onCreateResources() {
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/levelMenu/");
+
+		bmpTextureAtlas = new BuildableBitmapTextureAtlas(this.getTextureManager(),305*5, 305*5);
+		
+		buttonSlideTextureRegion1 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level1.png");
+		buttonSlideTextureRegion2 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level2.png");
+		buttonSlideTextureRegion3 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level3.png");
+		buttonSlideTextureRegion4 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level4.png");
+		buttonSlideTextureRegion5 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level5.png");
+
+		try {
+			bmpTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 0, 0));
+			bmpTextureAtlas.load();
+		} catch (TextureAtlasBuilderException e) {
+			Debug.e(e);
+		}
+	}
+
+	@Override
+	protected Scene onCreateScene() {
+		this.mEngine.registerUpdateHandler(new FPSLogger());
+		final Scene scene = new Scene();
+		scene.setBackground(new Background(0.3f, 0.3f, 0.3f));
+
+		menuSlider = new MenuSlider(this);
+		menuSlider.addItem(buttonSlideTextureRegion1);
+		menuSlider.addItem(buttonSlideTextureRegion2);
+		menuSlider.addItem(buttonSlideTextureRegion3);
+		menuSlider.addItem(buttonSlideTextureRegion4);
+		menuSlider.addItem(buttonSlideTextureRegion5);
+		
+		// In this example, buttons have the same size, I place the first item in the middle of the screen
+		int xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
+		int yOffset = (int) ((CAMERA_HEIGHT - buttonSlideTextureRegion1.getHeight())/2);
+		int gap = 100;
+		menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
+		
+		
+
+		scene.attachChild(menuSlider);
+		menuSlider.onShow(scene);
+		
+		return scene;
+	}
+	
+	//Method to launch the level clicked in the menu
+	public void startLevel(int level){
+		Intent intent;
+		
+		try {
+			Class<?> classe = Class.forName("com.gt.proto_v01.Level" + level);
+			
+			intent = new Intent(Proto_v01.this, classe);
+			startActivity(intent);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Lauch of Level FAILED");
+		}
+		
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
