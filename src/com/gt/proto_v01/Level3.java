@@ -226,7 +226,7 @@ public class Level3 extends SimpleBaseGameActivity implements
                 "laser.png", 0, 0, 1, 1);
         this.dematerialiseurTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.teleporteurBitmapTextureAtlas, this,
                 "dematerialiseur.png", 0, 0, 1, 1);
-        this.testPointTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.testPointTextureAtlas, this, "testPoint.png", 0, 0, 1, 1);
+        //this.testPointTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.testPointTextureAtlas, this, "testPoint.png", 0, 0, 1, 1);
 
         this.laserBitmapTextureAtlas.load();
         this.teleporteurBitmapTextureAtlas.load();
@@ -270,6 +270,7 @@ public class Level3 extends SimpleBaseGameActivity implements
                             }
                             if (asBobine.collidesWith(laser)) {
                                 mScene.detachChild(asBobine);
+                                asBobine.detachSelf();
                                 particleSystem.detachSelf();
                                 mScene.attachChild(particleSystem);
                                 particleEmitter.setCenter(asBobine.getX(),
