@@ -2,8 +2,9 @@ package com.gt.proto_v01;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Vector;
 
+import org.andengine.audio.sound.Sound;
+import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -51,8 +52,6 @@ import org.andengine.util.debug.Debug;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.opengl.GLES20;
-import android.util.FloatMath;
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -74,6 +73,11 @@ public class Level3 extends SimpleBaseGameActivity implements
 
     protected static final int CAMERA_WIDTH = 800;
     protected static final int CAMERA_HEIGHT = 480;
+    
+    private boolean needExplosion = true;
+    private Sound mExplosionSound;
+    private Sound mTeleportationSound;
+    private Sound mVictoireSound;
     
     private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
             laserBitmapTextureAtlas, teleporteurBitmapTextureAtlas,
@@ -119,8 +123,11 @@ public class Level3 extends SimpleBaseGameActivity implements
 
         final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 
-        return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
+        EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
                 new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+        engineOptions.getAudioOptions().setNeedsSound(true);
+        
+        return engineOptions; 
     }
 
     @Override
@@ -235,6 +242,27 @@ public class Level3 extends SimpleBaseGameActivity implements
         this.mBitmapTextureAtlas.load();
         this.mFireTextureAtlas.load();
         this.testPointTextureAtlas.load();
+        
+        SoundFactory.setAssetBasePath("mfx/");
+		try {
+			this.mExplosionSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "explosion.mp3");
+		} catch (final IOException e) {
+			Debug.e(e);
+		}
+		
+		SoundFactory.setAssetBasePath("mfx/");
+		try {
+			this.mTeleportationSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "teleportation.ogg");
+		} catch (final IOException e) {
+			Debug.e(e);
+		}
+		
+		SoundFactory.setAssetBasePath("mfx/");
+		try {
+			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+		} catch (final IOException e) {
+			Debug.e(e);
+		}
     }
 
     @Override
@@ -262,6 +290,7 @@ public class Level3 extends SimpleBaseGameActivity implements
                                 if (bBobine.getPosition().y < 13
                                         && bBobine.getPosition().y > 12) {
                                     mScene.attachChild(success);
+                                    Level3.this.mVictoireSound.play();
                                     levelDone = true;
                                     Vector2 gravity = new Vector2(0, 0);
                                     bBobine.setType(BodyType.StaticBody);
@@ -269,6 +298,10 @@ public class Level3 extends SimpleBaseGameActivity implements
                                 }
                             }
                             if (asBobine.collidesWith(laser)) {
+                            	if(needExplosion){
+                            		Level3.this.mExplosionSound.play();
+                            	}
+                            	needExplosion = false;
                                 mScene.detachChild(asBobine);
                                 asBobine.detachSelf();
                                 particleSystem.detachSelf();
@@ -603,6 +636,8 @@ public class Level3 extends SimpleBaseGameActivity implements
     						
 //    						Log.i("velocity x : ", "" + x2.getBody().getLinearVelocity().x);
 //    						Log.i("velocity y : ", "" + x2.getBody().getLinearVelocity().y);
+    						
+    						Level3.this.mTeleportationSound.play();
     						
     						runOnUpdateThread(new Runnable() {
     							public void run(){
