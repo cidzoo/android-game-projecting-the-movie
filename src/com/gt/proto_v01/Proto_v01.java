@@ -7,6 +7,7 @@ import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.util.FPSLogger;
+import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.atlas.bitmap.BuildableBitmapTextureAtlas;
@@ -14,6 +15,7 @@ import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSourc
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.debug.Debug;
 
@@ -43,7 +45,10 @@ public class Proto_v01 extends SimpleBaseGameActivity {
 	private ITextureRegion buttonSlideTextureRegion4;
 	private ITextureRegion buttonSlideTextureRegion5;
 	
+	protected TextureRegion bgTextureRegion;
+	
 	private MenuSlider menuSlider;
+	public ITextureRegion mMenuLogo;
 	
 
 	public EngineOptions onCreateEngineOptions() {
@@ -57,14 +62,16 @@ public class Proto_v01 extends SimpleBaseGameActivity {
 	protected void onCreateResources() {
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/levelMenu/");
 
-		bmpTextureAtlas = new BuildableBitmapTextureAtlas(this.getTextureManager(),305*5, 305*5);
+		bmpTextureAtlas = new BuildableBitmapTextureAtlas(this.getTextureManager(),501*5, 312*5);
 		
 		buttonSlideTextureRegion1 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level1.png");
 		buttonSlideTextureRegion2 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level2.png");
 		buttonSlideTextureRegion3 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level3.png");
 		buttonSlideTextureRegion4 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level4.png");
 		buttonSlideTextureRegion5 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level5.png");
-
+		
+		
+		
 		try {
 			bmpTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 0, 0));
 			bmpTextureAtlas.load();
@@ -89,7 +96,7 @@ public class Proto_v01 extends SimpleBaseGameActivity {
 		// In this example, buttons have the same size, I place the first item in the middle of the screen
 		int xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
 		int yOffset = (int) ((CAMERA_HEIGHT - buttonSlideTextureRegion1.getHeight())/2);
-		int gap = 100;
+		int gap = 50;
 		menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
 		
 		
@@ -105,12 +112,13 @@ public class Proto_v01 extends SimpleBaseGameActivity {
 		Intent intent;
 		
 		try {
+			//creating the name of the class to be launched with the param passed from MenuSlider.java
 			Class<?> classe = Class.forName("com.gt.proto_v01.Level" + level);
 			
 			intent = new Intent(Proto_v01.this, classe);
 			startActivity(intent);
+			
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("Lauch of Level FAILED");
 		}
