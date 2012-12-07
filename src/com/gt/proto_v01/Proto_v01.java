@@ -1,12 +1,14 @@
 package com.gt.proto_v01;
 
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
-import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.util.FPSLogger;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -15,29 +17,37 @@ import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSourc
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.texture.region.TextureRegion;
-import org.andengine.ui.activity.SimpleBaseGameActivity;
+import org.andengine.opengl.util.GLState;
+import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
+import android.view.KeyEvent;
 
 
 
-public class Proto_v01 extends SimpleBaseGameActivity {
+public class Proto_v01 extends BaseGameActivity
+{
+	private final int CAMERA_WIDTH = 800;
+	private final int CAMERA_HEIGHT = 480;
 	
-
-	// ===========================================================
-	// Constants
-	// ===========================================================
-
-	public static final int CAMERA_WIDTH = 800;
-	public static final int CAMERA_HEIGHT = 480;
-
-	// ===========================================================
-	// Fields
-	// ===========================================================
-
-	public BuildableBitmapTextureAtlas bmpTextureAtlas;
+	private Camera camera;
+	private Scene splashScene;
+	private Scene mainScene;
+	
+    private BitmapTextureAtlas splashTextureAtlas;
+    private ITextureRegion splashTextureRegion;
+    private Sprite splash;
+    
+	private enum SceneType
+	{
+		SPLASH,
+		MAIN,
+		OPTIONS,
+		WORLD_SELECTION,
+		LEVEL_SELECTION,
+		CONTROLLER
+	}
 	
 	private ITextureRegion buttonSlideTextureRegion1;
 	private ITextureRegion buttonSlideTextureRegion2;
@@ -45,33 +55,84 @@ public class Proto_v01 extends SimpleBaseGameActivity {
 	private ITextureRegion buttonSlideTextureRegion4;
 	private ITextureRegion buttonSlideTextureRegion5;
 	
-	protected TextureRegion bgTextureRegion;
-	
+	public BuildableBitmapTextureAtlas bmpTextureAtlas;
 	private MenuSlider menuSlider;
-	public ITextureRegion mMenuLogo;
 	
-
-	public EngineOptions onCreateEngineOptions() {
-		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-
-		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+	private SceneType currentScene = SceneType.SPLASH;
+	
+	@Override
+	public EngineOptions onCreateEngineOptions()
+	{
+		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new FillResolutionPolicy(), camera);
 		return engineOptions;
 	}
 
 	@Override
-	protected void onCreateResources() {
-		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/levelMenu/");
+	public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception
+	{
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+        splashTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 800, 480, TextureOptions.DEFAULT);
+        splashTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(splashTextureAtlas, this, "splash.png", 0, 0);
+        splashTextureAtlas.load();
+       
+        pOnCreateResourcesCallback.onCreateResourcesFinished();
+	}
 
+	@Override
+	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception
+	{
+		initSplashScene();
+        pOnCreateSceneCallback.onCreateSceneFinished(this.splashScene);
+	}
+
+	@Override
+	public void onPopulateScene(Scene pScene, OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception
+	{
+		mEngine.registerUpdateHandler(new TimerHandler(1f, new ITimerCallback() 
+		{
+            public void onTimePassed(final TimerHandler pTimerHandler) 
+            {
+                mEngine.unregisterUpdateHandler(pTimerHandler);
+                loadResources();
+                loadScenes();         
+                splash.detachSelf();
+                mEngine.setScene(mainScene);
+                currentScene = SceneType.MAIN;
+            }
+		}));
+  
+		pOnPopulateSceneCallback.onPopulateSceneFinished();
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) 
+	{  
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN)
+	    {	    	
+	    	switch (currentScene)
+	    	{
+	    		case SPLASH:
+	    			break;
+	    		case MAIN:
+	    			System.exit(0);
+	    			break;
+	    	}
+	    }
+	    return false; 
+	}
+	
+	public void loadResources() 
+	{
+		// Load your game resources here!
+		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		bmpTextureAtlas = new BuildableBitmapTextureAtlas(this.getTextureManager(),501*5, 312*5);
 		
-		buttonSlideTextureRegion1 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level1.png");
-		buttonSlideTextureRegion2 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level2.png");
-		buttonSlideTextureRegion3 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level3.png");
-		buttonSlideTextureRegion4 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level4.png");
-		buttonSlideTextureRegion5 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "level5.png");
-		
-		
-		
+		buttonSlideTextureRegion1 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level1.png");
+		buttonSlideTextureRegion2 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level2.png");
+		buttonSlideTextureRegion3 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level3.png");
+		buttonSlideTextureRegion4 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level4.png");
+		buttonSlideTextureRegion5 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level5.png");
 		try {
 			bmpTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 0, 0));
 			bmpTextureAtlas.load();
@@ -79,13 +140,13 @@ public class Proto_v01 extends SimpleBaseGameActivity {
 			Debug.e(e);
 		}
 	}
-
-	@Override
-	protected Scene onCreateScene() {
-		this.mEngine.registerUpdateHandler(new FPSLogger());
-		final Scene scene = new Scene();
-		scene.setBackground(new Background(0.3f, 0.3f, 0.3f));
-
+	
+	private void loadScenes()
+	{
+		// load your game here, you scenes
+		mainScene = new Scene();
+		mainScene.setBackground(new Background(0.3f, 0.3f, 0.3f));
+		
 		menuSlider = new MenuSlider(this);
 		menuSlider.addItem(buttonSlideTextureRegion1);
 		menuSlider.addItem(buttonSlideTextureRegion2);
@@ -99,13 +160,32 @@ public class Proto_v01 extends SimpleBaseGameActivity {
 		int gap = 50;
 		menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
 		
-		
-
-		scene.attachChild(menuSlider);
-		menuSlider.onShow(scene);
-		
-		return scene;
+		mainScene.attachChild(menuSlider);
+		menuSlider.onShow(mainScene);
 	}
+	
+	
+	//self-explicit ;-)
+	private void initSplashScene()
+	{
+		Debug.d("InitSplashScene", "begin!");
+    	splashScene = new Scene();
+    	splash = new Sprite(0, 0, splashTextureRegion, mEngine.getVertexBufferObjectManager())
+    	{
+    		@Override
+            protected void preDraw(GLState pGLState, Camera pCamera) 
+    		{
+                super.preDraw(pGLState, pCamera);
+                pGLState.enableDither();
+            }
+    	};
+    	
+    	//splash.setScale(1.5f);
+    	splash.setPosition((CAMERA_WIDTH - splash.getWidth()) * 0.5f, (CAMERA_HEIGHT - splash.getHeight()) * 0.5f);
+    	splashScene.attachChild(splash);
+	}
+
+
 	
 	//Method to launch the level clicked in the menu
 	public void startLevel(int level){
