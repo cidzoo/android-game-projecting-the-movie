@@ -26,8 +26,7 @@ import android.view.KeyEvent;
 
 
 
-public class Proto_v01 extends BaseGameActivity
-{
+public class Proto_v01 extends BaseGameActivity{
 	private final int CAMERA_WIDTH = 800;
 	private final int CAMERA_HEIGHT = 480;
 	
@@ -54,6 +53,7 @@ public class Proto_v01 extends BaseGameActivity
 	private ITextureRegion buttonSlideTextureRegion3;
 	private ITextureRegion buttonSlideTextureRegion4;
 	private ITextureRegion buttonSlideTextureRegion5;
+	private ITextureRegion buttonSlideTextureRegion6;
 	
 	public BuildableBitmapTextureAtlas bmpTextureAtlas;
 	private MenuSlider menuSlider;
@@ -133,6 +133,7 @@ public class Proto_v01 extends BaseGameActivity
 		buttonSlideTextureRegion3 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level3.png");
 		buttonSlideTextureRegion4 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level4.png");
 		buttonSlideTextureRegion5 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level5.png");
+		buttonSlideTextureRegion6 = BitmapTextureAtlasTextureRegionFactory.createFromAsset(bmpTextureAtlas, this, "levelMenu/level6.png");
 		try {
 			bmpTextureAtlas.build(new BlackPawnTextureAtlasBuilder<IBitmapTextureAtlasSource, BitmapTextureAtlas>(0, 0, 0));
 			bmpTextureAtlas.load();
@@ -153,6 +154,7 @@ public class Proto_v01 extends BaseGameActivity
 		menuSlider.addItem(buttonSlideTextureRegion3);
 		menuSlider.addItem(buttonSlideTextureRegion4);
 		menuSlider.addItem(buttonSlideTextureRegion5);
+		menuSlider.addItem(buttonSlideTextureRegion6);
 		
 		// In this example, buttons have the same size, I place the first item in the middle of the screen
 		int xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
@@ -204,3 +206,4 @@ public class Proto_v01 extends BaseGameActivity
 		}
 		
 	}
+}
