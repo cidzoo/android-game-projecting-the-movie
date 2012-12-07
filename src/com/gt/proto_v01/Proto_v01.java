@@ -204,4 +204,3 @@ public class Proto_v01 extends BaseGameActivity
 		}
 		
 	}
-}

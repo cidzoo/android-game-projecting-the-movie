@@ -1,3 +1,31 @@
+//package com.gt.proto_v01;
+//
+//import org.andengine.engine.camera.Camera;
+//import org.andengine.engine.options.EngineOptions;
+//import org.andengine.engine.options.ScreenOrientation;
+//import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+//import org.andengine.entity.scene.Scene;
+//import org.andengine.entity.sprite.Sprite;
+//import org.andengine.extension.physics.box2d.PhysicsConnector;
+//import org.andengine.extension.physics.box2d.PhysicsFactory;
+//import org.andengine.extension.physics.box2d.PhysicsWorld;
+//import org.andengine.opengl.texture.TextureOptions;
+//import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
+//import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
+//import org.andengine.opengl.texture.region.TextureRegion;
+//import org.andengine.ui.IGameInterface.OnCreateResourcesCallback;
+//import org.andengine.ui.IGameInterface.OnCreateSceneCallback;
+//import org.andengine.ui.IGameInterface.OnPopulateSceneCallback;
+//import org.andengine.ui.activity.SimpleBaseGameActivity;
+//
+//import android.util.Log;
+//
+//import com.badlogic.gdx.math.Vector2;
+//import com.badlogic.gdx.physics.box2d.Body;
+//import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+//import com.badlogic.gdx.physics.box2d.FixtureDef;
+//import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
+
 package com.gt.proto_v01;
 
 import java.io.IOException;
@@ -35,36 +63,31 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
+import org.andengine.util.math.MathUtils;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
-import android.util.Log;
-import android.view.KeyEvent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
-	//===========================================================
-	// Level3.java - Projet Game Tech - HES-SO Master
-	// 
-	// Niveau de Simon (démo siège trampoline)
-	// ===========================================================
-
-public class Level4 extends SimpleBaseGameActivity implements
+public class Level6 extends SimpleBaseGameActivity implements
 		IAccelerationListener, IOnSceneTouchListener {
 
 	protected static final int CAMERA_WIDTH = 800;
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas, ventBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas, ropeBitmapTextureAtlas;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, ventTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, mRopeTextureRegion;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
 	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
@@ -76,8 +99,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 	Sprite buttonPlay, success, buttonRestart;
 
-	AnimatedSprite asWb1, asWb2, asWb3, asVent;
-	Body bWb1, bWb2, bWb3, bVent;
+	AnimatedSprite asWb1, asWb2, asWb3;
+	Body bWb1, bWb2, bWb3;
 	float xWb1, xWb2, xWb3, yWb1, yWb2, yWb3;
 	float wb1Angle, wb2Angle, wb3Angle;
 
@@ -92,8 +115,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
-	boolean wasOnMovePointVent = false;
-	boolean wasOnRotatePointVent = false;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -119,7 +140,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
 			
-			// Button Restart Texture
+			// Button Restart
 			this.buttonRestartTexture = new BitmapTexture(
 					this.getTextureManager(), new IInputStreamOpener() {
 						@Override
@@ -170,7 +191,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 		
-		this.ventBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),100 , 155, TextureOptions.BILINEAR);
+		this.ropeBitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 5, 5, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -179,19 +201,19 @@ public class Level4 extends SimpleBaseGameActivity implements
 						"bobine3.png", 0, 0, 1, 1); // 64x32
 		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.bgBitmapTextureAtlas, this,
-						"bgRideau.png", 0, 0, 1, 1); // 64x32
+						"fond_aventure.png", 0, 0, 1, 1); // 64x32
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
-	
-		this.ventTextureRegion = BitmapTextureAtlasTextureRegionFactory.
-				createTiledFromAsset(this.ventBitmapTextureAtlas, this, "vent.png",0,0,1,1);
+		
+		this.mRopeTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.ropeBitmapTextureAtlas, this,
+						"corde3.png", 0, 0, 1, 1);
 
 		this.woodboardBitmapTextureAtlas.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
-		
-		this.ventBitmapTextureAtlas.load();
+		this.ropeBitmapTextureAtlas.load();
 
 	}
 
@@ -201,14 +223,14 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.mEngine.registerUpdateHandler(new FPSLogger());
 
 		this.mScene = new Scene();
+		
+		
 
 		mScene.registerUpdateHandler(new TimerHandler(0.1f, true,
 				new ITimerCallback() {
 					@Override
 					public void onTimePassed(final TimerHandler pTimerHandler) {
 						if (!levelDone) {
-							
-							/* test if bobine reached goal */
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
@@ -220,26 +242,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 									mPhysicsWorld.setGravity(gravity);
 								}
 							}
-							
-							/* test if bobine is in front of ventilator to give it velocity */
-							
-							if(		bVent.getLocalPoint(bBobine.getPosition()).x > 0 &&
-									bVent.getLocalPoint(bBobine.getPosition()).x < 10 &&
-									bVent.getLocalPoint(bBobine.getPosition()).y > 0  &&
-									bVent.getLocalPoint(bBobine.getPosition()).y < 2 ){
-								//- (bVent.getLocalPoint(bBobine.getPosition()).y-2)/2
-								float impulse = 10f-bVent.getLocalPoint(bBobine.getPosition()).x;
-										
-								if(impulse<0) impulse=0f;
-								System.out.println("impulse! =" + impulse);
-								
-								bBobine.applyLinearImpulse(
-										//
-										new Vector2(impulse
-												, 0f), 
-												bBobine.getPosition());
-							}
-							
 						}
 					}
 
@@ -368,9 +370,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 		// *********************
 		// ** WOOD BOARDS ***//
-		//**********************
 
-		asWb1 = new AnimatedSprite(250, CAMERA_HEIGHT - 15,
+		asWb1 = new AnimatedSprite(50, CAMERA_HEIGHT - 30,
 				this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
 		// asWb1.setScale(MathUtils.random(0.5f, 1.25f));
@@ -393,28 +394,70 @@ public class Level4 extends SimpleBaseGameActivity implements
 //		wb2Angle = (float) 0.17;
 //		bWb2.setTransform(bWb2.getPosition(), wb2Angle);
 
-		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion,
+		asWb3 = new AnimatedSprite(300, 50, this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
-		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
 				BodyType.KinematicBody, objectFixtureDef);
 		this.mScene.attachChild(asWb3);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
 				bWb3, true, true));
-		wb3Angle = (float) 0.15;
-		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
+//		wb3Angle = (float) 0.37;
+//		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
-		// *************************
-		// ****** VENTILATOR *******
-		//**************************
-		
-		asVent = new AnimatedSprite(50, CAMERA_HEIGHT - 130, this.ventTextureRegion, this.getVertexBufferObjectManager());
-		bVent = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asVent, BodyType.KinematicBody, objectFixtureDef);
-		this.mScene.attachChild(asVent);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asVent, bVent, true, true));
-		
-		
+		Body corde = makeRope(50, 365, 50);
+//		mScene.detachChild(corde);
+//		asWb3.attachChild(corde);
+		joinRopeBodies(bWb3, corde, mRopeTextureRegion.getHeight());
+
 		return this.mScene;
+	}
+	
+	public Body makeRope(int links, float x, float y) {
+//		mPhysicsWorld.setContinuousPhysics(false);
+	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.01f, 0.01f, 0.01f);
+	    Sprite l1 = new Sprite(x, y, mRopeTextureRegion.getWidth(), mRopeTextureRegion.getHeight(), mRopeTextureRegion, this.getVertexBufferObjectManager());
+	 
+	    final Sprite firstLink = l1;
+	 
+	    Body b1 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, l1, BodyType.DynamicBody, objectFixtureDef);
+	    Body premierLien = b1;
+	    this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(l1, b1, true, true));
+	    this.mScene.attachChild(l1);
+	               
+	    final float linkHeight = mRopeTextureRegion.getHeight();
+	    for (int i = 1; i < links; ++i) {
+	        Sprite l2 = new Sprite(x, y + (i * linkHeight), mRopeTextureRegion.getWidth(), linkHeight, mRopeTextureRegion, this.getVertexBufferObjectManager());
+	        Body b2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, l2, BodyType.DynamicBody, objectFixtureDef);
+	        this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(l2, b2, true, true));
+	        this.mScene.attachChild(l2);
+	 
+	        joinRopeBodies(b1, b2, linkHeight);
+	 
+	        b1 = b2;
+	        l1 = l2;
+	    }
+	    return premierLien;
+	}
+	 
+	public void joinRopeBodies(Body chainLinkBody1, Body chainLinkBody2, float bodyHeight) {
+	    // FIRST CREATE TWO BODIES, THEN USE THIS CODE TO JOIN THEM TOGETHER
+	    RevoluteJointDef chainLinkDef = new RevoluteJointDef();
+	    chainLinkDef.collideConnected = false;
+	    chainLinkDef.initialize(chainLinkBody1, chainLinkBody2, chainLinkBody1.getWorldCenter());
+	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF PREVIOUS BODY
+	    // USUALLY EQUALS PREVIOUS BODY LENGTH
+	    chainLinkDef.localAnchorA.set(0.0f, ((bodyHeight/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
+	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF THIS BODY
+	    // USUALLY EQUALS THIS BODY LENGTH
+	    chainLinkDef.localAnchorB.set(0.0f, -((bodyHeight/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
+	    chainLinkDef.enableMotor = false;
+	    chainLinkDef.motorSpeed = 0;
+	    chainLinkDef.enableLimit = false;
+	    chainLinkDef.lowerAngle = MathUtils.degToRad(0);
+	    //chainLinkDef.upperAngle = MathUtils.degToRad(180);
+	    chainLinkDef.upperAngle = MathUtils.degToRad(90);
+	    // NOW THAT WE DEFINED THE JOINT, HERE WE ACTUALLY CREATE THE JOINT
+	    Joint chainLink1 = mPhysicsWorld.createJoint(chainLinkDef);
 	}
 
 	@Override
@@ -464,27 +507,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 					}
 				}
 				
-				x = asVent.getX();
-				y = asVent.getY();
-				xW = asVent.getWidth();
-				yW = asVent.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
-						yOnTouchDown = pSceneTouchEvent.getY();
-						wasOnRotatePointVent = true;
-					}
-				} else {
-					if (pSceneTouchEvent.getX() > x + 30
-							&& pSceneTouchEvent.getX() < x + xW - 30) {
-						if (pSceneTouchEvent.getY() > y - 20
-								&& pSceneTouchEvent.getY() < y + yW + 20) {
-							wasOnMovePointVent = true;
-						}
-					}
-				}
-				
 				//play level
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
@@ -530,13 +552,13 @@ public class Level4 extends SimpleBaseGameActivity implements
 					xW = asWb1.getWidth();
 					yW = asWb1.getHeight();
 					if (wasOnMovePointWb1){
-						bWb1.setTransform(
-								pSceneTouchEvent.getX()
-								/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-								pSceneTouchEvent.getY()
-								/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-								bWb1.getAngle());
-
+							bWb1.setTransform(
+									pSceneTouchEvent.getX()
+											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+									pSceneTouchEvent.getY()
+											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+									bWb1.getAngle());
+						
 					} else {
 
 						if (wasOnRotatePointWb1) {
@@ -548,32 +570,19 @@ public class Level4 extends SimpleBaseGameActivity implements
 							if (wasOnMovePointWb2){
 								bWb2.setTransform(
 										pSceneTouchEvent.getX()
-										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										pSceneTouchEvent.getY()
-										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										bWb2.getAngle());
+							
+						} else {
 
-							} else {
+							if (wasOnRotatePointWb2) {
+								angle = pSceneTouchEvent.getY() - yOnTouchDown;
+								bWb2.setTransform(bWb2.getPosition(), angle / 100);
 
-								if (wasOnRotatePointWb2) {
-									angle = pSceneTouchEvent.getY() - yOnTouchDown;
-									bWb2.setTransform(bWb2.getPosition(), angle / 100);
-
-								} else{
-									
-									if (wasOnMovePointVent){
-										bVent.setTransform(pSceneTouchEvent.getX() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-												pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, bVent.getAngle());
-										
-									} else{
-										
-										if (wasOnRotatePointVent){
-											angle = pSceneTouchEvent.getY() - yOnTouchDown;
-											bVent.setTransform(bVent.getPosition(), angle / 100);
-										}
-									}
-								}
 							}
+						}
 						}
 					}
 					// Log.d("myFlags", "yOnTouchDown and gety : " +
@@ -586,8 +595,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 						wasOnMovePointWb1 = false;
 						wasOnRotatePointWb2 = false;
 						wasOnMovePointWb2 = false;
-						wasOnRotatePointVent = false;
-						wasOnMovePointVent = false;
 					}
 				}
 			}
