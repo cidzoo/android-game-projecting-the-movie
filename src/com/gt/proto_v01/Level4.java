@@ -170,7 +170,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 		
-		this.ventBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),100 , 155, TextureOptions.BILINEAR);
+		this.ventBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),75 , 121, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -185,7 +185,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 						"woodboard.png", 0, 0, 1, 1);
 	
 		this.ventTextureRegion = BitmapTextureAtlasTextureRegionFactory.
-				createTiledFromAsset(this.ventBitmapTextureAtlas, this, "vent.png",0,0,1,1);
+				createTiledFromAsset(this.ventBitmapTextureAtlas, this, "ventON.png",0,0,1,1);
 
 		this.woodboardBitmapTextureAtlas.load();
 		this.mBitmapTextureAtlas.load();
@@ -225,19 +225,20 @@ public class Level4 extends SimpleBaseGameActivity implements
 							
 							if(		bVent.getLocalPoint(bBobine.getPosition()).x > 0 &&
 									bVent.getLocalPoint(bBobine.getPosition()).x < 10 &&
-									bVent.getLocalPoint(bBobine.getPosition()).y > 0  &&
-									bVent.getLocalPoint(bBobine.getPosition()).y < 2 ){
+									bVent.getLocalPoint(bBobine.getPosition()).y > -asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2  &&
+									bVent.getLocalPoint(bBobine.getPosition()).y < asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2 ){
 								//- (bVent.getLocalPoint(bBobine.getPosition()).y-2)/2
-								float impulse = 10f-bVent.getLocalPoint(bBobine.getPosition()).x;
+								float impulse = 7f-bVent.getLocalPoint(bBobine.getPosition()).x;
 										
 								if(impulse<0) impulse=0f;
 								System.out.println("impulse! =" + impulse);
 								
+								
 								bBobine.applyLinearImpulse(
 										//
-										new Vector2(impulse
-												, 0f), 
-												bBobine.getPosition());
+										new Vector2((float) (impulse * Math.cos(bVent.getAngle())),
+												(float) (impulse * Math.sin(bVent.getAngle()))), 
+												bVent.getPosition());
 							}
 							
 						}
@@ -408,7 +409,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 		// ****** VENTILATOR *******
 		//**************************
 		
-		asVent = new AnimatedSprite(50, CAMERA_HEIGHT - 130, this.ventTextureRegion, this.getVertexBufferObjectManager());
+		asVent = new AnimatedSprite(10, CAMERA_HEIGHT - 130, this.ventTextureRegion, this.getVertexBufferObjectManager());
 		bVent = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asVent, BodyType.KinematicBody, objectFixtureDef);
 		this.mScene.attachChild(asVent);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asVent, bVent, true, true));
