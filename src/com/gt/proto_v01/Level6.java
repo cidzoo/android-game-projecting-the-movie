@@ -95,8 +95,6 @@ public class Level6 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	private int mFaceCount = 0;
-
 	Sprite buttonPlay, success, buttonRestart;
 
 	AnimatedSprite asWb1, asWb2, asWb3;
@@ -237,9 +235,9 @@ public class Level6 extends SimpleBaseGameActivity implements
 										&& bBobine.getPosition().y > 12) {
 									mScene.attachChild(success);
 									levelDone = true;
-									Vector2 gravity = new Vector2(0, 0);
+									//Vector2 gravity = new Vector2(0, 0);
 									bBobine.setType(BodyType.StaticBody);
-									mPhysicsWorld.setGravity(gravity);
+									//mPhysicsWorld.setGravity(gravity);
 								}
 							}
 						}
@@ -336,23 +334,6 @@ public class Level6 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
 		// ---
-		// final AnimatedSprite asButtonPlay;
-		// final Body bButtonPlay;
-		// asButtonPlay = new AnimatedSprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay,
-		// this.getVertexBufferObjectManager());
-		// // face.setScale(MathUtils.random(0.5f, 1.25f));
-		// bButtonPlay = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
-		// asButtonPlay,
-		// BodyType.StaticBody, objectFixtureDef);
-		// this.mScene.attachChild(asButtonPlay);
-		// this.mPhysicsWorld.registerPhysicsConnector(new
-		// PhysicsConnector(asButtonPlay,
-		// bButtonPlay, true, true));
-
-		// final Sprite buttonPlay = new Sprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay, this.getVertexBufferObjectManager());
-		// mScene.attachChild(buttonPlay);
 		
 		
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
@@ -404,7 +385,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 //		wb3Angle = (float) 0.37;
 //		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
-		Body corde = makeRope(50, 365, 50);
+		Body corde = makeRope(50, 370, 50);
 //		mScene.detachChild(corde);
 //		asWb3.attachChild(corde);
 		joinRopeBodies(bWb3, corde, mRopeTextureRegion.getHeight());
@@ -414,10 +395,8 @@ public class Level6 extends SimpleBaseGameActivity implements
 	
 	public Body makeRope(int links, float x, float y) {
 //		mPhysicsWorld.setContinuousPhysics(false);
-	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.01f, 0.01f, 0.01f);
+	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.08f, 0.0f, 0.01f);
 	    Sprite l1 = new Sprite(x, y, mRopeTextureRegion.getWidth(), mRopeTextureRegion.getHeight(), mRopeTextureRegion, this.getVertexBufferObjectManager());
-	 
-	    final Sprite firstLink = l1;
 	 
 	    Body b1 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, l1, BodyType.DynamicBody, objectFixtureDef);
 	    Body premierLien = b1;
@@ -453,11 +432,11 @@ public class Level6 extends SimpleBaseGameActivity implements
 	    chainLinkDef.enableMotor = false;
 	    chainLinkDef.motorSpeed = 0;
 	    chainLinkDef.enableLimit = false;
-	    chainLinkDef.lowerAngle = MathUtils.degToRad(0);
+	    chainLinkDef.lowerAngle = MathUtils.degToRad(45);
 	    //chainLinkDef.upperAngle = MathUtils.degToRad(180);
 	    chainLinkDef.upperAngle = MathUtils.degToRad(90);
 	    // NOW THAT WE DEFINED THE JOINT, HERE WE ACTUALLY CREATE THE JOINT
-	    Joint chainLink1 = mPhysicsWorld.createJoint(chainLinkDef);
+	    mPhysicsWorld.createJoint(chainLinkDef);
 	}
 
 	@Override
@@ -529,18 +508,6 @@ public class Level6 extends SimpleBaseGameActivity implements
 						startActivity(intent);
 					}
 				}
-
-				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
-				// + " and Y is " + pSceneTouchEvent.getY());
-				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
-				// " "
-				// + bBobine.getPosition().y);
-				// Log.d("myFlags", "sprite coord : " + asBobine.getX() + " "
-				// + asBobine.getY());
-				// Log.d("myFlags", "sprite to body coord : " + asBobine.getX()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT + " "
-				// + asBobine.getY()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
 
 				return true;
 			} else {
