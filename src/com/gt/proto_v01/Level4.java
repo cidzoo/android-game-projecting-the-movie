@@ -59,12 +59,12 @@ public class Level4 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas, chairBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas, ventBitmapTextureAtlas;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, chairTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, ventTextureRegion;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
 	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
@@ -76,8 +76,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 	Sprite buttonPlay, success, buttonRestart;
 
-	AnimatedSprite asWb1, asWb2, asWb3, asChair;
-	Body bWb1, bWb2, bWb3, bChair;
+	AnimatedSprite asWb1, asWb2, asWb3, asVent;
+	Body bWb1, bWb2, bWb3, bVent;
 	float xWb1, xWb2, xWb3, yWb1, yWb2, yWb3;
 	float wb1Angle, wb2Angle, wb3Angle;
 
@@ -92,8 +92,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
-	boolean wasOnMovePointChair = false;
-	boolean wasOnRotatePointChair = false;
+	boolean wasOnMovePointVent = false;
+	boolean wasOnRotatePointVent = false;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -170,7 +170,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 		
-		this.chairBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),100 , 122, TextureOptions.BILINEAR);
+		this.ventBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),100 , 155, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -184,13 +184,14 @@ public class Level4 extends SimpleBaseGameActivity implements
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
 	
-		this.chairTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.chairBitmapTextureAtlas, this, "chair_100x122px.png",0,0,1,1);
+		this.ventTextureRegion = BitmapTextureAtlasTextureRegionFactory.
+				createTiledFromAsset(this.ventBitmapTextureAtlas, this, "vent.png",0,0,1,1);
 
 		this.woodboardBitmapTextureAtlas.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
 		
-		this.chairBitmapTextureAtlas.load();
+		this.ventBitmapTextureAtlas.load();
 
 	}
 
@@ -206,6 +207,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 					@Override
 					public void onTimePassed(final TimerHandler pTimerHandler) {
 						if (!levelDone) {
+							
+							/* test if bobine reached goal */
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
@@ -217,6 +220,26 @@ public class Level4 extends SimpleBaseGameActivity implements
 									mPhysicsWorld.setGravity(gravity);
 								}
 							}
+							
+							/* test if bobine is in front of ventilator to give it velocity */
+							
+							if(		bVent.getLocalPoint(bBobine.getPosition()).x > 0 &&
+									bVent.getLocalPoint(bBobine.getPosition()).x < 10 &&
+									bVent.getLocalPoint(bBobine.getPosition()).y > 0  &&
+									bVent.getLocalPoint(bBobine.getPosition()).y < 2 ){
+								//- (bVent.getLocalPoint(bBobine.getPosition()).y-2)/2
+								float impulse = 10f-bVent.getLocalPoint(bBobine.getPosition()).x;
+										
+								if(impulse<0) impulse=0f;
+								System.out.println("impulse! =" + impulse);
+								
+								bBobine.applyLinearImpulse(
+										//
+										new Vector2(impulse
+												, 0f), 
+												bBobine.getPosition());
+							}
+							
 						}
 					}
 
@@ -381,14 +404,14 @@ public class Level4 extends SimpleBaseGameActivity implements
 		wb3Angle = (float) 0.15;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
-		// *********************
-		// ****** CHAIR *******
-		//*********************
+		// *************************
+		// ****** VENTILATOR *******
+		//**************************
 		
-		asChair = new AnimatedSprite(50, CAMERA_HEIGHT - 130, this.chairTextureRegion, this.getVertexBufferObjectManager());
-		bChair = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asChair, BodyType.KinematicBody, objectFixtureDef);
-		this.mScene.attachChild(asChair);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asChair, bChair, true, true));
+		asVent = new AnimatedSprite(50, CAMERA_HEIGHT - 130, this.ventTextureRegion, this.getVertexBufferObjectManager());
+		bVent = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asVent, BodyType.KinematicBody, objectFixtureDef);
+		this.mScene.attachChild(asVent);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asVent, bVent, true, true));
 		
 		
 		return this.mScene;
@@ -441,23 +464,23 @@ public class Level4 extends SimpleBaseGameActivity implements
 					}
 				}
 				
-				x = asChair.getX();
-				y = asChair.getY();
-				xW = asChair.getWidth();
-				yW = asChair.getHeight();
+				x = asVent.getX();
+				y = asVent.getY();
+				xW = asVent.getWidth();
+				yW = asVent.getHeight();
 				if (pSceneTouchEvent.getX() < x + xW + 20
 						&& pSceneTouchEvent.getX() > x + xW - 30) {
 					if (pSceneTouchEvent.getY() > y - 20
 							&& pSceneTouchEvent.getY() < y + yW + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
-						wasOnRotatePointChair = true;
+						wasOnRotatePointVent = true;
 					}
 				} else {
 					if (pSceneTouchEvent.getX() > x + 30
 							&& pSceneTouchEvent.getX() < x + xW - 30) {
 						if (pSceneTouchEvent.getY() > y - 20
 								&& pSceneTouchEvent.getY() < y + yW + 20) {
-							wasOnMovePointChair = true;
+							wasOnMovePointVent = true;
 						}
 					}
 				}
@@ -538,15 +561,15 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 								} else{
 									
-									if (wasOnMovePointChair){
-										bChair.setTransform(pSceneTouchEvent.getX() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-												pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, bChair.getAngle());
+									if (wasOnMovePointVent){
+										bVent.setTransform(pSceneTouchEvent.getX() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+												pSceneTouchEvent.getY() / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT, bVent.getAngle());
 										
 									} else{
 										
-										if (wasOnRotatePointChair){
+										if (wasOnRotatePointVent){
 											angle = pSceneTouchEvent.getY() - yOnTouchDown;
-											bChair.setTransform(bChair.getPosition(), angle / 100);
+											bVent.setTransform(bVent.getPosition(), angle / 100);
 										}
 									}
 								}
@@ -563,8 +586,8 @@ public class Level4 extends SimpleBaseGameActivity implements
 						wasOnMovePointWb1 = false;
 						wasOnRotatePointWb2 = false;
 						wasOnMovePointWb2 = false;
-						wasOnRotatePointChair = false;
-						wasOnMovePointChair = false;
+						wasOnRotatePointVent = false;
+						wasOnMovePointVent = false;
 					}
 				}
 			}
