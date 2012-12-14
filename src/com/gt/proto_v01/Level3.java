@@ -110,7 +110,8 @@ public class Level3 extends SimpleBaseGameActivity implements
     AnimatedSprite asBobine;
     Body bBobine;
     
-    boolean levelDone = false;
+    private boolean levelDone = false;
+    private boolean bobineDetruite = false;
     float yOnTouchDown = 0;
     
     boolean wasOnRotatePointWb1 = false;
@@ -284,7 +285,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 
                     @Override
                     public void onTimePassed(final TimerHandler pTimerHandler) {
-                        if (!levelDone) {
+                        if (!levelDone && !bobineDetruite) {
                             if (bBobine.getPosition().x < 21
                                     && bBobine.getPosition().x > 20) {
                                 if (bBobine.getPosition().y < 13
@@ -302,12 +303,14 @@ public class Level3 extends SimpleBaseGameActivity implements
                             		Level3.this.mExplosionSound.play();
                             	}
                             	needExplosion = false;
+                            	bobineDetruite = true;
                                 mScene.detachChild(asBobine);
                                 asBobine.setVisible(false);
                                 asBobine.detachSelf();
-                                asBobine.clearUpdateHandlers();
-                                mPhysicsWorld.unregisterPhysicsConnector(mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(asBobine));
-        						mPhysicsWorld.destroyBody(bBobine);	
+                                
+//                                asBobine.clearUpdateHandlers();
+//                                mPhysicsWorld.unregisterPhysicsConnector(mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(asBobine));
+//        						mPhysicsWorld.destroyBody(bBobine); // cette ligne fait planter le feu...	
                                 
                                 particleSystem.detachSelf();
                                 mScene.attachChild(particleSystem);
