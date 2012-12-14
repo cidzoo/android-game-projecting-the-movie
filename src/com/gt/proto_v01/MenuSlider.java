@@ -1,6 +1,4 @@
 package com.gt.proto_v01;
-import com.gt.proto_v01.Proto_v01;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +17,6 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.debug.Debug;
 import org.andengine.util.modifier.ease.EaseCubicOut;
-
-import android.content.Intent;
 
 
 

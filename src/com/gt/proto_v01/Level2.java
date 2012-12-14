@@ -38,7 +38,6 @@ import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;

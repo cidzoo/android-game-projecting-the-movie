@@ -67,7 +67,6 @@ import org.andengine.util.math.MathUtils;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -77,6 +76,7 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
@@ -87,23 +87,25 @@ public class Level6 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas, ropeBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas, ropeBitmapTextureAtlas, clapBitmapTextureAtlas;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, mRopeTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, mRopeTextureRegion, clapTextureRegion;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
 	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
 			successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
+	
+	private Joint ropeJoin;
 
 	Sprite buttonPlay, success, buttonRestart;
 
-	AnimatedSprite asWb1, asWb2, asWb3;
-	Body bWb1, bWb2, bWb3;
+	AnimatedSprite asWb1, asWb2, asWb3, asClap;
+	Body bWb1, bWb2, bWb3, bClap;
 	float xWb1, xWb2, xWb3, yWb1, yWb2, yWb3;
 	float wb1Angle, wb2Angle, wb3Angle;
 
@@ -198,6 +200,9 @@ public class Level6 extends SimpleBaseGameActivity implements
 		
 		this.ropeBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 5, 5, TextureOptions.BILINEAR);
+		
+		this.clapBitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 50, 52, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -210,6 +215,9 @@ public class Level6 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
+		this.clapTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.clapBitmapTextureAtlas, this,
+						"clap.png", 0, 0, 1, 1);
 		
 		this.mRopeTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.ropeBitmapTextureAtlas, this,
@@ -219,6 +227,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
 		this.ropeBitmapTextureAtlas.load();
+		this.clapBitmapTextureAtlas.load();
 
 	}
 
@@ -391,6 +400,16 @@ public class Level6 extends SimpleBaseGameActivity implements
 		this.mScene.attachChild(asWb3);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
 				bWb3, true, true));
+		
+		asClap = new AnimatedSprite(500, 200, this.clapTextureRegion,
+				this.getVertexBufferObjectManager());
+		bClap = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asClap,
+				BodyType.KinematicBody, objectFixtureDef);
+		bClap.setUserData("clap");
+		this.mScene.attachChild(asClap);
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
+				bWb3, true, true));
+		
 //		wb3Angle = (float) 0.37;
 //		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
@@ -404,7 +423,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 	
 	public Body makeRope(int links, float x, float y) {
 //		mPhysicsWorld.setContinuousPhysics(false);
-	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.9f, 0f, 0f, false);
+	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.7f, -1f, 1f);
 	    Sprite l1 = new Sprite(x, y, mRopeTextureRegion.getWidth(), mRopeTextureRegion.getHeight(), mRopeTextureRegion, this.getVertexBufferObjectManager());
 	 
 	    Body b1 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, l1, BodyType.DynamicBody, objectFixtureDef);
@@ -437,7 +456,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 	public void joinRopeBodies(Body chainLinkBody1, Body chainLinkBody2, float bodyHeight) {
 	    // FIRST CREATE TWO BODIES, THEN USE THIS CODE TO JOIN THEM TOGETHER
 	    RevoluteJointDef chainLinkDef = new RevoluteJointDef();
-	    chainLinkDef.collideConnected = false;
+	    chainLinkDef.collideConnected = true;
 	    chainLinkDef.initialize(chainLinkBody1, chainLinkBody2, chainLinkBody2.getWorldCenter());
 	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF PREVIOUS BODY
 	    // USUALLY EQUALS PREVIOUS BODY LENGTH
@@ -462,7 +481,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF THIS BODY
 	    // USUALLY EQUALS THIS BODY LENGTH
 	    chainLinkDef2.localAnchorB.set(0.0f, -((hauteurBody/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
-	    mPhysicsWorld.createJoint(chainLinkDef2);
+	    ropeJoin = mPhysicsWorld.createJoint(chainLinkDef2);
 	}
 
 	@Override
@@ -609,14 +628,15 @@ public class Level6 extends SimpleBaseGameActivity implements
     					runOnUpdateThread(new Runnable() {
 							public void run(){
 								attachBobineToRope(x2.getBody(), x1.getBody(), mRopeTextureRegion.getHeight());
-//								mScene.detachChild(asBobine);
-////                                asBobine.setVisible(false);
-//                                asBobine.detachSelf();
-//                                asBobine.clearUpdateHandlers();
-//                                //mPhysicsWorld.unregisterPhysicsConnector(mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(asBobine));
-//        						//mPhysicsWorld.destroyBody(bBobine);	
-//								asBobine.setPosition(0, 0);
-//								spriteDernierFragment.attachChild(asBobine);
+							}
+						});
+        			}
+    			} if(x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
+    				if(ropeJoin != null && x1.getBody().getUserData().equals("clap") && x2.getBody().getUserData().equals("bobine")){
+    					//mScene.detachChild(asBobine);
+    					runOnUpdateThread(new Runnable() {
+							public void run(){
+								mPhysicsWorld.destroyJoint(ropeJoin);
 							}
 						});
         			}
