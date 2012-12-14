@@ -36,7 +36,7 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 	/**
 	 * Duration of the inertia effect
 	 */
-	protected static float INERTIA_DURATION = 0.5f;
+	protected static float INERTIA_DURATION = 0.8f;
 	/**
 	 * Multiplier applied to last move to defined inertia distance
 	 */
@@ -111,7 +111,7 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 	public MenuSlider(Proto_v01 parent){
 		this.parent = parent;
 	}
-    
+    private int gap2=0;
 
 	// ===========================================================
 	// Methodes - Initialisation and menu preparation
@@ -149,7 +149,9 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 	 * @param gap (int) - space between two sprites
 	 */
 	protected void createMenuBoxes(int offsetX, int offsetY, int gap) {
-
+		
+		gap2=gap;
+		
 		if(container == null){
 			container = new Entity();
 		}else{
@@ -314,12 +316,16 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 	public void onScrollFinished(ScrollDetector pScollDetector, int pPointerID,
 			float pDistanceX, float pDistanceY) {
 		
+		int T = gap2 + 501; //gap2 = gap in method createMenuBoxes; 501 = width of the sprite
 		float next = currentX + lastMove*INERTIA_COEF;
 		if ( (next < minX)  ){    
 			next = minX;  
 	    }else if(next > maxX){  
 			next = maxX;
-	    }
+	    }else { //to put the sprite in the middle of the screen
+	    	next = (int) Math.round(next/T);
+	    	next = next * T;
+	    	}
 				 
 		inertiaMove = new MoveModifier(INERTIA_DURATION,currentX,next,0,0,EaseCubicOut.getInstance());
 		container.registerEntityModifier(inertiaMove);
@@ -335,12 +341,7 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 			float pSceneX, float pSceneY) {
 		
 		Debug.d("On click item "+iItemClicked);
-
-		
-			
 			parent.startLevel(iItemClicked);
-			
-		
 	}
 	
 	
