@@ -303,7 +303,12 @@ public class Level3 extends SimpleBaseGameActivity implements
                             	}
                             	needExplosion = false;
                                 mScene.detachChild(asBobine);
+                                asBobine.setVisible(false);
                                 asBobine.detachSelf();
+                                asBobine.clearUpdateHandlers();
+                                mPhysicsWorld.unregisterPhysicsConnector(mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(asBobine));
+        						mPhysicsWorld.destroyBody(bBobine);	
+                                
                                 particleSystem.detachSelf();
                                 mScene.attachChild(particleSystem);
                                 particleEmitter.setCenter(asBobine.getX(),

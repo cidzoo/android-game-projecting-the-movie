@@ -67,12 +67,17 @@ import org.andengine.util.math.MathUtils;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
 public class Level6 extends SimpleBaseGameActivity implements
@@ -104,6 +109,8 @@ public class Level6 extends SimpleBaseGameActivity implements
 
 	AnimatedSprite asBobine;
 	Body bBobine;
+	Body dernierFragmentCorde;
+	Sprite spriteDernierFragment;
 
 	boolean levelDone = false;
 
@@ -260,6 +267,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 		this.mScene.setOnSceneTouchListener(this);
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
+		this.mPhysicsWorld.setContactListener(createContactListener());
 
 		final Rectangle ground = new Rectangle(0, CAMERA_HEIGHT - 55,
 				CAMERA_WIDTH, 1, vertexBufferObjectManager);
@@ -329,6 +337,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 		bBobine = PhysicsFactory.createCircleBody(this.mPhysicsWorld, asBobine,
 				BodyType.DynamicBody,
 				PhysicsFactory.createFixtureDef(1, 0, 0.5f));
+		bBobine.setUserData("bobine");
 
 		this.mScene.attachChild(asBobine);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
@@ -395,11 +404,12 @@ public class Level6 extends SimpleBaseGameActivity implements
 	
 	public Body makeRope(int links, float x, float y) {
 //		mPhysicsWorld.setContinuousPhysics(false);
-	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.08f, 0.0f, 0.01f);
+	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.9f, 0f, 0f, false);
 	    Sprite l1 = new Sprite(x, y, mRopeTextureRegion.getWidth(), mRopeTextureRegion.getHeight(), mRopeTextureRegion, this.getVertexBufferObjectManager());
 	 
 	    Body b1 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, l1, BodyType.DynamicBody, objectFixtureDef);
 	    Body premierLien = b1;
+	    
 	    this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(l1, b1, true, true));
 	    this.mScene.attachChild(l1);
 	               
@@ -409,12 +419,18 @@ public class Level6 extends SimpleBaseGameActivity implements
 	        Body b2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, l2, BodyType.DynamicBody, objectFixtureDef);
 	        this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(l2, b2, true, true));
 	        this.mScene.attachChild(l2);
-	 
+	        
+	        
 	        joinRopeBodies(b1, b2, linkHeight);
 	 
 	        b1 = b2;
 	        l1 = l2;
+	        spriteDernierFragment = l2;
 	    }
+	    
+	    //dernierFragmentCorde = PhysicsFactory.createBoxBody(this.mPhysicsWorld, l1, BodyType.DynamicBody, objectFixtureDef);
+	    b1.setUserData("dernierFragmentCorde");
+	    
 	    return premierLien;
 	}
 	 
@@ -422,7 +438,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 	    // FIRST CREATE TWO BODIES, THEN USE THIS CODE TO JOIN THEM TOGETHER
 	    RevoluteJointDef chainLinkDef = new RevoluteJointDef();
 	    chainLinkDef.collideConnected = false;
-	    chainLinkDef.initialize(chainLinkBody1, chainLinkBody2, chainLinkBody1.getWorldCenter());
+	    chainLinkDef.initialize(chainLinkBody1, chainLinkBody2, chainLinkBody2.getWorldCenter());
 	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF PREVIOUS BODY
 	    // USUALLY EQUALS PREVIOUS BODY LENGTH
 	    chainLinkDef.localAnchorA.set(0.0f, ((bodyHeight/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
@@ -432,11 +448,21 @@ public class Level6 extends SimpleBaseGameActivity implements
 	    chainLinkDef.enableMotor = false;
 	    chainLinkDef.motorSpeed = 0;
 	    chainLinkDef.enableLimit = false;
-	    chainLinkDef.lowerAngle = MathUtils.degToRad(45);
+	    chainLinkDef.lowerAngle = MathUtils.degToRad(0);
 	    //chainLinkDef.upperAngle = MathUtils.degToRad(180);
 	    chainLinkDef.upperAngle = MathUtils.degToRad(90);
 	    // NOW THAT WE DEFINED THE JOINT, HERE WE ACTUALLY CREATE THE JOINT
 	    mPhysicsWorld.createJoint(chainLinkDef);
+	}
+	
+	public void attachBobineToRope(Body dernierFragment, Body bobine, float hauteurBody){
+		RevoluteJointDef chainLinkDef2 = new RevoluteJointDef();
+		chainLinkDef2.localAnchorA.set(0.0f, ((hauteurBody/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
+		chainLinkDef2.initialize(dernierFragment, bobine, bobine.getWorldCenter());
+	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF THIS BODY
+	    // USUALLY EQUALS THIS BODY LENGTH
+	    chainLinkDef2.localAnchorB.set(0.0f, -((hauteurBody/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
+	    mPhysicsWorld.createJoint(chainLinkDef2);
 	}
 
 	@Override
@@ -569,6 +595,55 @@ public class Level6 extends SimpleBaseGameActivity implements
 
 		return false;
 	}
+	
+	private ContactListener createContactListener(){
+    	ContactListener contactListener = new ContactListener(){
+    		public void beginContact(Contact contact){
+    			
+    			final Fixture x1 = contact.getFixtureA();
+    			final Fixture x2 = contact.getFixtureB();
+    			
+    			if(x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
+    				if(x1.getBody().getUserData().equals("dernierFragmentCorde") && x2.getBody().getUserData().equals("bobine")){
+    					//mScene.detachChild(asBobine);
+    					runOnUpdateThread(new Runnable() {
+							public void run(){
+								attachBobineToRope(x2.getBody(), x1.getBody(), mRopeTextureRegion.getHeight());
+//								mScene.detachChild(asBobine);
+////                                asBobine.setVisible(false);
+//                                asBobine.detachSelf();
+//                                asBobine.clearUpdateHandlers();
+//                                //mPhysicsWorld.unregisterPhysicsConnector(mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(asBobine));
+//        						//mPhysicsWorld.destroyBody(bBobine);	
+//								asBobine.setPosition(0, 0);
+//								spriteDernierFragment.attachChild(asBobine);
+							}
+						});
+        			}
+    			}
+    		}
+    		
+    		@Override
+			public void endContact(Contact contact) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+				// TODO Auto-generated method stub
+				
+			}
+    	};
+			
+			return contactListener;
+    	}
 
 	@Override
 	public void onAccelerationAccuracyChanged(
