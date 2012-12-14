@@ -181,18 +181,14 @@ public class Proto_v01 extends BaseGameActivity{
                 pGLState.enableDither();
             }
     	};
-    	
-    	//splash.setScale(1.5f);
     	splash.setPosition((CAMERA_WIDTH - splash.getWidth()) * 0.5f, (CAMERA_HEIGHT - splash.getHeight()) * 0.5f);
     	splashScene.attachChild(splash);
 	}
 
 
-	
 	//Method to launch the level clicked in the menu
 	public void startLevel(int level){
 		Intent intent;
-		
 		try {
 			//creating the name of the class to be launched with the param passed from MenuSlider.java
 			Class<?> classe = Class.forName("com.gt.proto_v01.Level" + level);
@@ -204,6 +200,5 @@ public class Proto_v01 extends BaseGameActivity{
 			e.printStackTrace();
 			System.out.println("Lauch of Level FAILED");
 		}
-		
 	}
 }
