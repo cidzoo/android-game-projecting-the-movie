@@ -8,6 +8,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
@@ -17,6 +18,7 @@ import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSourc
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.util.GLState;
 import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.debug.Debug;
@@ -34,7 +36,7 @@ public class Proto_v01 extends BaseGameActivity{
 	private Scene splashScene;
 	private Scene mainScene;
 	
-    private BitmapTextureAtlas splashTextureAtlas;
+    private BitmapTextureAtlas splashTextureAtlas, bgBitmapTextureAtlas;
     private ITextureRegion splashTextureRegion;
     private Sprite splash;
     
@@ -56,6 +58,7 @@ public class Proto_v01 extends BaseGameActivity{
 	private ITextureRegion buttonSlideTextureRegion6;
 	
 	public BuildableBitmapTextureAtlas bmpTextureAtlas;
+	protected ITextureRegion bgTextureRegion;
 	private MenuSlider menuSlider;
 	
 	private SceneType currentScene = SceneType.SPLASH;
@@ -146,7 +149,14 @@ public class Proto_v01 extends BaseGameActivity{
 	{
 		// load your game here, you scenes
 		mainScene = new Scene();
-		mainScene.setBackground(new Background(0.3f, 0.3f, 0.3f));
+		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
+		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.bgBitmapTextureAtlas, this,
+				"menu_bg_800x480.png", 0, 0, 1, 1); // 64x32
+		this.bgBitmapTextureAtlas.load();
+		Sprite bgSprite = new Sprite(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bgTextureRegion, this.getVertexBufferObjectManager());
+		SpriteBackground background = new SpriteBackground(bgSprite);
+		mainScene.setBackground(background);
+		//mainScene.setBackground(new Background(0.3f, 0.3f, 0.3f));
 		
 		menuSlider = new MenuSlider(this);
 		menuSlider.addItem(buttonSlideTextureRegion1);
@@ -156,7 +166,7 @@ public class Proto_v01 extends BaseGameActivity{
 		menuSlider.addItem(buttonSlideTextureRegion5);
 		menuSlider.addItem(buttonSlideTextureRegion6);
 		
-		// In this example, buttons have the same size, I place the first item in the middle of the screen
+		// place the first in the middle of the screen, with a gap between them of 50px
 		int xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
 		int yOffset = (int) ((CAMERA_HEIGHT - buttonSlideTextureRegion1.getHeight())/2);
 		int gap = 50;

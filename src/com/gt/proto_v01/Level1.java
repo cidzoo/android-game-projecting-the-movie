@@ -38,6 +38,7 @@ import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.view.KeyEvent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -538,7 +539,16 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.disableAccelerationSensor();
 	}
 
-	
+	@Override // on back key down, restart the menu activity
+	public boolean onKeyDown(int keyCode, KeyEvent event) 
+	{  
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN)
+	    {	    	
+	    	Intent intent = new Intent(getApplicationContext(), Proto_v01.class);
+	    	startActivity(intent);
+	    }
+	    return false; 
+	}
 	
 	// ===========================================================
 	// Inner and Anonymous Classes
