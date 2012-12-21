@@ -7,7 +7,6 @@ import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.TextureOptions;
@@ -18,7 +17,6 @@ import org.andengine.opengl.texture.atlas.bitmap.source.IBitmapTextureAtlasSourc
 import org.andengine.opengl.texture.atlas.buildable.builder.BlackPawnTextureAtlasBuilder;
 import org.andengine.opengl.texture.atlas.buildable.builder.ITextureAtlasBuilder.TextureAtlasBuilderException;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.util.GLState;
 import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.debug.Debug;
@@ -149,14 +147,13 @@ public class Proto_v01 extends BaseGameActivity{
 	{
 		// load your game here, you scenes
 		mainScene = new Scene();
+		//load background for the menu
 		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
-		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.bgBitmapTextureAtlas, this,
-				"menu_bg_800x480.png", 0, 0, 1, 1); // 64x32
+		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.bgBitmapTextureAtlas, this,"menu_bg_800x480.png", 0, 0, 1, 1); // 64x32
 		this.bgBitmapTextureAtlas.load();
 		Sprite bgSprite = new Sprite(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bgTextureRegion, this.getVertexBufferObjectManager());
 		SpriteBackground background = new SpriteBackground(bgSprite);
 		mainScene.setBackground(background);
-		//mainScene.setBackground(new Background(0.3f, 0.3f, 0.3f));
 		
 		menuSlider = new MenuSlider(this);
 		menuSlider.addItem(buttonSlideTextureRegion1);

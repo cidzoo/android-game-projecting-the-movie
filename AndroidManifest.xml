@@ -14,7 +14,7 @@
         
         <activity
             android:name=".Proto_v01"
-            android:label="@string/title_activity_proto_v01" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
