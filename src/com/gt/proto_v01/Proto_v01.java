@@ -1,5 +1,9 @@
 package com.gt.proto_v01;
 
+import java.io.IOException;
+
+import org.andengine.audio.sound.Sound;
+import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -22,6 +26,7 @@ import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
+import android.net.NetworkInfo.DetailedState;
 import android.view.KeyEvent;
 
 
@@ -29,6 +34,10 @@ import android.view.KeyEvent;
 public class Proto_v01 extends BaseGameActivity{
 	private final int CAMERA_WIDTH = 800;
 	private final int CAMERA_HEIGHT = 480;
+	
+	int xOffset; 
+	int yOffset;
+	int gap;
 	
 	private Camera camera;
 	private Scene splashScene;
@@ -60,6 +69,8 @@ public class Proto_v01 extends BaseGameActivity{
 	private MenuSlider menuSlider;
 	
 	private SceneType currentScene = SceneType.SPLASH;
+	
+	boolean gamePaused=false;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions()
@@ -141,20 +152,22 @@ public class Proto_v01 extends BaseGameActivity{
 		} catch (TextureAtlasBuilderException e) {
 			Debug.e(e);
 		}
+		
+		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
+		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.bgBitmapTextureAtlas, this,"menu_bg_800x480.png", 0, 0, 1, 1); // 64x32
+		this.bgBitmapTextureAtlas.load();
 	}
 	
 	private void loadScenes()
 	{
-		// load your game here, you scenes
+		// load your game here, your scenes
 		mainScene = new Scene();
 		//load background for the menu
-		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
-		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.bgBitmapTextureAtlas, this,"menu_bg_800x480.png", 0, 0, 1, 1); // 64x32
-		this.bgBitmapTextureAtlas.load();
 		Sprite bgSprite = new Sprite(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bgTextureRegion, this.getVertexBufferObjectManager());
 		SpriteBackground background = new SpriteBackground(bgSprite);
 		mainScene.setBackground(background);
 		
+		//create the MenuSlider with the buttons
 		menuSlider = new MenuSlider(this);
 		menuSlider.addItem(buttonSlideTextureRegion1);
 		menuSlider.addItem(buttonSlideTextureRegion2);
@@ -163,10 +176,7 @@ public class Proto_v01 extends BaseGameActivity{
 		menuSlider.addItem(buttonSlideTextureRegion5);
 		menuSlider.addItem(buttonSlideTextureRegion6);
 		
-		// place the first in the middle of the screen, with a gap between them of 50px
-		int xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
-		int yOffset = (int) ((CAMERA_HEIGHT - buttonSlideTextureRegion1.getHeight())/2);
-		int gap = 50;
+		// place the first button in the middle of the screen, with a gap between two buttons of 50px
 		menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
 		
 		mainScene.attachChild(menuSlider);
@@ -203,9 +213,42 @@ public class Proto_v01 extends BaseGameActivity{
 			intent = new Intent(Proto_v01.this, classe);
 			startActivity(intent);
 			
+			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			System.out.println("Lauch of Level FAILED");
 		}
+	}
+	
+	@Override
+	public void onResumeGame() {
+		super.onResumeGame();
+		if(gamePaused){
+			menuSlider = new MenuSlider(this);
+			menuSlider.addItem(buttonSlideTextureRegion1);
+			menuSlider.addItem(buttonSlideTextureRegion2);
+			menuSlider.addItem(buttonSlideTextureRegion3);
+			menuSlider.addItem(buttonSlideTextureRegion4);
+			menuSlider.addItem(buttonSlideTextureRegion5);
+			menuSlider.addItem(buttonSlideTextureRegion6);
+			
+			// place the first button in the middle of the screen, with a gap between two buttons of 50px
+			int xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
+			int yOffset = (int) ((CAMERA_HEIGHT - buttonSlideTextureRegion1.getHeight())/2);
+			int gap = 50;
+			menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
+			
+			mainScene.attachChild(menuSlider);
+			menuSlider.onShow(mainScene);
+		}
+		
+	}
+
+	@Override
+	public void onPauseGame() {
+		super.onPauseGame();
+		menuSlider.onHide(mainScene);
+		gamePaused=true;
+		menuSlider=null;
 	}
 }

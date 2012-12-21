@@ -538,8 +538,6 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 		this.disableAccelerationSensor();
 	}
-
-	
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
