@@ -38,6 +38,7 @@ import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.view.KeyEvent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -537,9 +538,6 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 		this.disableAccelerationSensor();
 	}
-
-	
-	
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================

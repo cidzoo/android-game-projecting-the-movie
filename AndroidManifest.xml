@@ -11,9 +11,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
         <activity
             android:name=".Proto_v01"
-            android:label="@string/title_activity_proto_v01" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,57 +24,33 @@
         <activity
             android:name=".Level1"
             android:label="@string/title_activity_level1" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
             android:name=".Level2"
             android:label="@string/title_activity_level2" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
             android:name=".Level3"
             android:label="@string/title_activity_level3" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
             android:name=".Level4"
             android:label="@string/title_activity_level4" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
             android:name=".Level5"
             android:label="@string/title_activity_level5" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         
         <activity
             android:name=".Level6"
             android:label="@string/title_activity_level6" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
     </application>
 
