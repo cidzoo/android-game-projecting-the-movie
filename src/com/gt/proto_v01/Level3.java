@@ -74,7 +74,7 @@ public class Level3 extends SimpleBaseGameActivity implements
     protected static final int CAMERA_WIDTH = 800;
     protected static final int CAMERA_HEIGHT = 480;
     
-    private boolean needExplosion = true;
+    //private boolean needExplosion = true;
     private Sound mExplosionSound;
     private Sound mTeleportationSound;
     private Sound mVictoireSound;
@@ -299,18 +299,13 @@ public class Level3 extends SimpleBaseGameActivity implements
                                 }
                             }
                             if (asBobine.collidesWith(laser)) {
-                            	if(needExplosion){
+                            	if(!bobineDetruite){
                             		Level3.this.mExplosionSound.play();
                             	}
-                            	needExplosion = false;
                             	bobineDetruite = true;
                                 mScene.detachChild(asBobine);
                                 asBobine.setVisible(false);
                                 asBobine.detachSelf();
-                                
-//                                asBobine.clearUpdateHandlers();
-//                                mPhysicsWorld.unregisterPhysicsConnector(mPhysicsWorld.getPhysicsConnectorManager().findPhysicsConnectorByShape(asBobine));
-//        						mPhysicsWorld.destroyBody(bBobine); // cette ligne fait planter le feu...	
                                 
                                 particleSystem.detachSelf();
                                 mScene.attachChild(particleSystem);
@@ -663,10 +658,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 //                          	  	mScene.attachChild(asTestPoint);
     								
     								x2.getBody().setTransform(positionX/32, positionY/32, 0);
-    								x2.getBody().setLinearVelocity(-1*nombre * (float)Math.sin(Math.toRadians(asTeleporteur2.getRotation())), nombre * (float)(Math.cos(Math.toRadians(asTeleporteur2.getRotation()))));
-    								
-//    								Log.i("velocity x2 : ", "" + x2.getBody().getLinearVelocity().x);
-//    	    						Log.i("velocity y2 : ", "" + x2.getBody().getLinearVelocity().y);
+    								x2.getBody().setLinearVelocity(-1 * nombre * (float)Math.sin(Math.toRadians(asTeleporteur2.getRotation())), nombre * (float)(Math.cos(Math.toRadians(asTeleporteur2.getRotation()))));
     							}
     						});
     					}
