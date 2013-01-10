@@ -85,6 +85,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
+	boolean levelPlayed=false;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -314,16 +315,16 @@ public class Level1 extends SimpleBaseGameActivity implements
 		// this.buttonPlay, this.getVertexBufferObjectManager());
 		// mScene.attachChild(buttonPlay);
 		
+		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
+		mScene.attachChild(buttonRestart);
+		
 		
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
 		
-		buttonRestart = new Sprite(10, 10,
-				this.buttonRestartTextureRegion,
-				this.getVertexBufferObjectManager());
-		mScene.attachChild(buttonRestart);
+		
 
 		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
@@ -415,28 +416,30 @@ public class Level1 extends SimpleBaseGameActivity implements
 					}
 				}
 				
-				//play level
-				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
+				//play level and after restart
+					if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
-					if (pSceneTouchEvent.getY() > 40
-							&& pSceneTouchEvent.getY() < 120) {
-						Vector2 gravity = new Vector2(0,
-								SensorManager.GRAVITY_EARTH);
-						this.mPhysicsWorld.setGravity(gravity);
-						mScene.detachChild(buttonPlay);
+						if (pSceneTouchEvent.getY() > 40
+								&& pSceneTouchEvent.getY() < 120) {
+							if(!levelPlayed){
+							Vector2 gravity = new Vector2(0,
+									SensorManager.GRAVITY_EARTH);
+							this.mPhysicsWorld.setGravity(gravity);
+							mScene.detachChild(buttonPlay);
+							levelPlayed=true;
+							}
+							else{ //to restart
+								Intent intent = getIntent();
+								finish();
+								startActivity(intent);
+							}
+						}
 					}
-				}
+					
 				
-				//restart level
-				if (pSceneTouchEvent.getX() > 10
-						&& pSceneTouchEvent.getX() < 82) {
-					if (pSceneTouchEvent.getY() > 10
-							&& pSceneTouchEvent.getY() < 82) {
-						Intent intent = getIntent();
-						finish();
-						startActivity(intent);
-					}
-				}
+				
+				//restart level button
+				
 
 				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
 				// + " and Y is " + pSceneTouchEvent.getY());
