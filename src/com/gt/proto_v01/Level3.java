@@ -118,6 +118,7 @@ public class Level3 extends SimpleBaseGameActivity implements
     boolean wasOnMovePointWb1 = false;
     boolean wasOnRotatePointWb2 = false;
     boolean wasOnMovePointWb2 = false;
+    boolean levelPlayed=false;
 
     @Override
     public EngineOptions onCreateEngineOptions() {
@@ -432,16 +433,13 @@ public class Level3 extends SimpleBaseGameActivity implements
         this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
                 asBobine, bBobine, true, true));
         // ---
+        buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
+		mScene.attachChild(buttonRestart);
         
         buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
                 this.buttonPlayTextureRegion,
                 this.getVertexBufferObjectManager());
         mScene.attachChild(buttonPlay);
-
-        buttonRestart = new Sprite(10, 10,
-                this.buttonRestartTextureRegion,
-                this.getVertexBufferObjectManager());
-        mScene.attachChild(buttonRestart);
 
         success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
                 this.successTextureRegion, this.getVertexBufferObjectManager());
@@ -543,33 +541,32 @@ public class Level3 extends SimpleBaseGameActivity implements
                         }
                     }
                 }
-
-                if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
-                        && pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
-                    if (pSceneTouchEvent.getY() > 40
-                            && pSceneTouchEvent.getY() < 120) {
-                        Vector2 gravity = new Vector2(0,
-                                SensorManager.GRAVITY_EARTH);
-                        this.mPhysicsWorld.setGravity(gravity);
-                        bBobine.setType(BodyType.DynamicBody);
+                
+              //play level and after restart
+				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
+					&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
+					if (pSceneTouchEvent.getY() > 40
+							&& pSceneTouchEvent.getY() < 120) {
+						if(!levelPlayed){
+						Vector2 gravity = new Vector2(0,
+								SensorManager.GRAVITY_EARTH);
+						this.mPhysicsWorld.setGravity(gravity);
+						bBobine.setType(BodyType.DynamicBody);
                         Vector2 vector = bBobine.getLinearVelocity();
                         bBobine.setLinearVelocity(vector.x, vector.y + 20); // Permet de définir la vitesse de la bobine
-                        mScene.detachChild(buttonPlay);
-                        //bBobine.applyLinearImpulse(220, -50, bBobine.getPosition().x, bBobine.getPosition().y);
-                    }
-                }
-
-                //restart level
-                if (pSceneTouchEvent.getX() > 10
-                        && pSceneTouchEvent.getX() < 82) {
-                    if (pSceneTouchEvent.getY() > 10
-                            && pSceneTouchEvent.getY() < 82) {
-                        Intent intent = getIntent();
-                        finish();
-                        startActivity(intent);
-                    }
-                }
-
+						mScene.detachChild(buttonPlay);
+						//bBobine.applyLinearImpulse(220, -50, bBobine.getPosition().x, bBobine.getPosition().y);
+						levelPlayed=true;
+						}
+						else{ //to restart
+							Intent intent = getIntent();
+							finish();
+							startActivity(intent);
+						}
+					}
+				}
+				
+                
                 return true;
             } else {
                 if (pSceneTouchEvent.isActionMove()) {
