@@ -72,11 +72,14 @@ public class Proto_v01 extends BaseGameActivity{
 	
 	boolean gamePaused=false;
 	
+	 private Sound menuSound;
+	
 	@Override
 	public EngineOptions onCreateEngineOptions()
 	{
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new FillResolutionPolicy(), camera);
+		engineOptions.getAudioOptions().setNeedsSound(true);
 		return engineOptions;
 	}
 
@@ -156,6 +159,15 @@ public class Proto_v01 extends BaseGameActivity{
 		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
 		this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.bgBitmapTextureAtlas, this,"menu_bg_800x480.png", 0, 0, 1, 1); // 64x32
 		this.bgBitmapTextureAtlas.load();
+		
+		//the sound for the menu
+		SoundFactory.setAssetBasePath("mfx/");
+		try {
+			this.menuSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "menu2.mp3");
+			this.menuSound.setLooping(true);
+		} catch (final IOException e) {
+			Debug.e(e);
+		}
 	}
 	
 	private void loadScenes()
@@ -177,13 +189,15 @@ public class Proto_v01 extends BaseGameActivity{
 		menuSlider.addItem(buttonSlideTextureRegion6);
 		
 		// place the first button in the middle of the screen, with a gap between two buttons of 50px
+		xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
+		yOffset = (int) ((CAMERA_HEIGHT - buttonSlideTextureRegion1.getHeight())/2);
+		gap = 50;
 		menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
 		
 		mainScene.attachChild(menuSlider);
 		menuSlider.onShow(mainScene);
 	}
-	
-	
+
 	//self-explicit ;-)
 	private void initSplashScene()
 	{
@@ -224,6 +238,7 @@ public class Proto_v01 extends BaseGameActivity{
 	public void onResumeGame() {
 		super.onResumeGame();
 		if(gamePaused){
+			
 			menuSlider = new MenuSlider(this);
 			menuSlider.addItem(buttonSlideTextureRegion1);
 			menuSlider.addItem(buttonSlideTextureRegion2);
@@ -233,13 +248,11 @@ public class Proto_v01 extends BaseGameActivity{
 			menuSlider.addItem(buttonSlideTextureRegion6);
 			
 			// place the first button in the middle of the screen, with a gap between two buttons of 50px
-			int xOffset = (int) ((CAMERA_WIDTH - buttonSlideTextureRegion1.getWidth())/2); 
-			int yOffset = (int) ((CAMERA_HEIGHT - buttonSlideTextureRegion1.getHeight())/2);
-			int gap = 50;
 			menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
 			
 			mainScene.attachChild(menuSlider);
 			menuSlider.onShow(mainScene);
+			menuSound.play();
 		}
 		
 	}
@@ -250,5 +263,6 @@ public class Proto_v01 extends BaseGameActivity{
 		menuSlider.onHide(mainScene);
 		gamePaused=true;
 		menuSlider=null;
+		menuSound.stop();
 	}
 }
