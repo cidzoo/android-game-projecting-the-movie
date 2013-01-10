@@ -41,6 +41,7 @@ import org.andengine.util.debug.Debug;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -378,7 +379,11 @@ public class Level1 extends SimpleBaseGameActivity implements
 				bWb3, true, true));
 		wb3Angle = (float) 0.37;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
+		
+		String msg= "Hello! Welcome to the game. To play, click on the play button, on the top-right cornet of the screen";
+		gameToast(msg);
 
+		
 		return this.mScene;
 	}
 
@@ -553,4 +558,16 @@ public class Level1 extends SimpleBaseGameActivity implements
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
+	
+	//Method for generating Toast messages as they need to run on UI thread
+    public void gameToast(final String msg) {
+    this.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+           Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG).show();
+        }
+    });
+}
+
+	
 }
