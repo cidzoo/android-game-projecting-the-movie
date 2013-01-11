@@ -23,33 +23,40 @@
         </activity>
         <activity
             android:name=".Level1"
-            android:label="@string/title_activity_level1" >
+            android:label="@string/title_activity_level1"
+            android:noHistory="true" >
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
+            
         </activity>
         <activity
             android:name=".Level2"
-            android:label="@string/title_activity_level2" >
+            android:label="@string/title_activity_level2" 
+            android:noHistory="true">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
             android:name=".Level3"
-            android:label="@string/title_activity_level3" >
+            android:label="@string/title_activity_level3" 
+            android:noHistory="true">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
             android:name=".Level4"
-            android:label="@string/title_activity_level4" >
+            android:label="@string/title_activity_level4" 
+            android:noHistory="true">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
             android:name=".Level5"
-            android:label="@string/title_activity_level5" >
+            android:label="@string/title_activity_level5" 
+            android:noHistory="true">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         
         <activity
             android:name=".Level6"
-            android:label="@string/title_activity_level6" >
+            android:label="@string/title_activity_level6" 
+            android:noHistory="true">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
     </application>
