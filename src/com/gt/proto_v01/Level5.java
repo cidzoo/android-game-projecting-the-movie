@@ -445,20 +445,6 @@ public class Level5 extends SimpleBaseGameActivity implements
 		this.mScene.attachChild(asWb1);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb1,
 				bWb1, true, true));
-		// wb1Angle = (float) 0.17;
-		// bWb1.setTransform(bWb1.getPosition(), wb1Angle);
-
-		// asWb2 = new AnimatedSprite(240, 287, this.woodboardTextureRegion,
-		// this.getVertexBufferObjectManager());
-		// // asWb2.setScale(MathUtils.random(0.5f, 1.25f));
-		// bWb2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb2,
-		// BodyType.KinematicBody, objectFixtureDef);
-		// this.mScene.attachChild(asWb2);
-		// this.mPhysicsWorld.registerPhysicsConnector(new
-		// PhysicsConnector(asWb2,
-		// bWb2, true, true));
-		// wb2Angle = 0.6f;
-		// bWb2.setAngularVelocity(wb2Angle);
 
 		asWb3 = new AnimatedSprite(CAMERA_WIDTH - 150, 250,
 				this.woodboardTextureRegion,
@@ -492,15 +478,6 @@ public class Level5 extends SimpleBaseGameActivity implements
 		// bSpeakers.setTransform(bSpeakers.getPosition(), 0.7f);
 		this.mScene.attachChild(asSpeakers);
 		// *****************//
-
-		// *****
-//		PhysicalBody po = new PhysicalBody("speakers.png",64,200, 
-//				this,mPhysicsWorld,this.mScene);
-//		
-	//		po.setPosition(CAMERA_WIDTH - 300+32,
-//				CAMERA_HEIGHT - 250);
-		
-		// *****
 
 		return this.mScene;
 	}
@@ -581,18 +558,6 @@ public class Level5 extends SimpleBaseGameActivity implements
 						// bSeatMp.setAngularVelocity(100f);
 					}
 				
-				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
-				// + " and Y is " + pSceneTouchEvent.getY());
-				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
-				// " "
-				// + bBobine.getPosition().y);
-				// Log.d("myFlags", "sprite coord : " + asBobine.getX() + " "
-				// + asBobine.getY());
-				// Log.d("myFlags", "sprite to body coord : " + asBobine.getX()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT + " "
-				// + asBobine.getY()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove()) {
@@ -632,10 +597,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 							}
 						}
 					}
-					// Log.d("myFlags", "yOnTouchDown and gety : " +
-					// yOnTouchDown
-					// + " " + pSceneTouchEvent.getY());
-					// Log.d("myFlags", "angle" + angle);
+					
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;
@@ -658,10 +620,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onAccelerationChanged(final AccelerationData pAccelerationData) {
-		// final Vector2 gravity = Vector2Pool.obtain(pAccelerationData.getX(),
-		// pAccelerationData.getY());
-		// this.mPhysicsWorld.setGravity(gravity);
-		// Vector2Pool.recycle(gravity);
+		
 	}
 
 	@Override

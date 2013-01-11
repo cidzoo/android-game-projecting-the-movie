@@ -347,23 +347,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
 		// ---
-		// final AnimatedSprite asButtonPlay;
-		// final Body bButtonPlay;
-		// asButtonPlay = new AnimatedSprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay,
-		// this.getVertexBufferObjectManager());
-		// // face.setScale(MathUtils.random(0.5f, 1.25f));
-		// bButtonPlay = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
-		// asButtonPlay,
-		// BodyType.StaticBody, objectFixtureDef);
-		// this.mScene.attachChild(asButtonPlay);
-		// this.mPhysicsWorld.registerPhysicsConnector(new
-		// PhysicsConnector(asButtonPlay,
-		// bButtonPlay, true, true));
-
-		// final Sprite buttonPlay = new Sprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay, this.getVertexBufferObjectManager());
-		// mScene.attachChild(buttonPlay);
 		
 		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
@@ -515,18 +498,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 					}
 				}
 
-				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
-				// + " and Y is " + pSceneTouchEvent.getY());
-				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
-				// " "
-				// + bBobine.getPosition().y);
-				// Log.d("myFlags", "sprite coord : " + asBobine.getX() + " "
-				// + asBobine.getY());
-				// Log.d("myFlags", "sprite to body coord : " + asBobine.getX()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT + " "
-				// + asBobine.getY()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove()) {
@@ -583,10 +554,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 							}
 						}
 					}
-					// Log.d("myFlags", "yOnTouchDown and gety : " +
-					// yOnTouchDown
-					// + " " + pSceneTouchEvent.getY());
-					// Log.d("myFlags", "angle" + angle);
+					
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;

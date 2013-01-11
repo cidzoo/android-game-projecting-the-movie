@@ -606,10 +606,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 						}
 						}
 					}
-					// Log.d("myFlags", "yOnTouchDown and gety : " +
-					// yOnTouchDown
-					// + " " + pSceneTouchEvent.getY());
-					// Log.d("myFlags", "angle" + angle);
+					
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;
@@ -682,10 +679,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onAccelerationChanged(final AccelerationData pAccelerationData) {
-		// final Vector2 gravity = Vector2Pool.obtain(pAccelerationData.getX(),
-		// pAccelerationData.getY());
-		// this.mPhysicsWorld.setGravity(gravity);
-		// Vector2Pool.recycle(gravity);
+		
 	}
 
 	@Override

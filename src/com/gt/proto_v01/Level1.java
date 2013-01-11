@@ -40,6 +40,7 @@ import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -380,8 +381,17 @@ public class Level1 extends SimpleBaseGameActivity implements
 		wb3Angle = (float) 0.37;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
-		String msg= "Hello! Welcome to the game. To play, click on the play button, on the top-right cornet of the screen";
+		String msg= "Hello! Welcome to the game.";
 		gameToast(msg);
+		
+		
+		
+		String msg2= "To play, click on the play button, on the top-right corner of the screen";
+		gameToastUp(msg2);
+		
+
+		String msg3= "Move the items from the bottom of the sreen to help the BOBINE go in the PROJECTOR";
+		gameToastDown(msg3);
 
 		
 		return this.mScene;
@@ -453,20 +463,6 @@ public class Level1 extends SimpleBaseGameActivity implements
 							}
 						}
 					}
-					
-
-				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
-				// + " and Y is " + pSceneTouchEvent.getY());
-				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
-				// " "
-				// + bBobine.getPosition().y);
-				// Log.d("myFlags", "sprite coord : " + asBobine.getX() + " "
-				// + asBobine.getY());
-				// Log.d("myFlags", "sprite to body coord : " + asBobine.getX()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT + " "
-				// + asBobine.getY()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove()) {
@@ -510,10 +506,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 						}
 						}
 					}
-					// Log.d("myFlags", "yOnTouchDown and gety : " +
-					// yOnTouchDown
-					// + " " + pSceneTouchEvent.getY());
-					// Log.d("myFlags", "angle" + angle);
+					
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;
@@ -536,10 +529,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onAccelerationChanged(final AccelerationData pAccelerationData) {
-		// final Vector2 gravity = Vector2Pool.obtain(pAccelerationData.getX(),
-		// pAccelerationData.getY());
-		// this.mPhysicsWorld.setGravity(gravity);
-		// Vector2Pool.recycle(gravity);
+		
 	}
 
 	@Override
@@ -564,10 +554,33 @@ public class Level1 extends SimpleBaseGameActivity implements
     this.runOnUiThread(new Runnable() {
         @Override
         public void run() {
-           Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG).show();
+        	Toast toast= Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG);
+        	toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER, 0, 0); //position center center of the screen
+        	toast.show();
         }
     });
 }
 
+    public void gameToastUp(final String msg) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            	Toast toast= Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG);
+            	toast.setGravity(Gravity.TOP|Gravity.CENTER, 60, 0); //position Top-right center of the screen
+            	toast.show();
+            }
+        });
+    }
+    
+    public void gameToastDown(final String msg) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            	Toast toast= Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG);
+            	toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.LEFT, 0, 120); //position center-bottom left of the screen
+            	toast.show();
+            }
+        });
+    }
 	
 }
