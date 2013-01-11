@@ -426,18 +426,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
-				// + " and Y is " + pSceneTouchEvent.getY());
-				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
-				// " "
-				// + bBobine.getPosition().y);
-				// Log.d("myFlags", "sprite coord : " + asBobine.getX() + " "
-				// + asBobine.getY());
-				// Log.d("myFlags", "sprite to body coord : " + asBobine.getX()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT + " "
-				// + asBobine.getY()
-				// / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT);
-
+			
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove()) {
@@ -476,10 +465,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 						}
 						}
 					}
-					// Log.d("myFlags", "yOnTouchDown and gety : " +
-					// yOnTouchDown
-					// + " " + pSceneTouchEvent.getY());
-					// Log.d("myFlags", "angle" + angle);
+					
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;
@@ -502,10 +488,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onAccelerationChanged(final AccelerationData pAccelerationData) {
-		// final Vector2 gravity = Vector2Pool.obtain(pAccelerationData.getX(),
-		// pAccelerationData.getY());
-		// this.mPhysicsWorld.setGravity(gravity);
-		// Vector2Pool.recycle(gravity);
+		
 	}
 
 	@Override
