@@ -3,6 +3,8 @@ package com.gt.proto_v01;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.andengine.audio.sound.Sound;
+import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -77,7 +79,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	private int mFaceCount = 0;
+	 private Sound mVictoireSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -97,6 +99,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
+	boolean levelPlayed=false;
 
 	RevoluteJoint revJoint2;
 
@@ -105,8 +108,11 @@ public class Level5 extends SimpleBaseGameActivity implements
 
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 
-		return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
-				new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
+                new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+        engineOptions.getAudioOptions().setNeedsSound(true);
+        
+        return engineOptions; 
 	}
 
 	@Override
@@ -217,6 +223,13 @@ public class Level5 extends SimpleBaseGameActivity implements
 						"speakers.png", 0, 0, 1, 1);
 		this.speakersBitmapTextureAtlas.load();
 		// ----------------------------------------------
+		
+		SoundFactory.setAssetBasePath("mfx/");
+		try {
+			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+		} catch (final IOException e) {
+			Debug.e(e);
+		}
 
 	}
 
@@ -239,6 +252,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 								if (bBobine.getPosition().y < 13
 										&& bBobine.getPosition().y > 12) {
 									mScene.attachChild(success);
+									Level5.this.mVictoireSound.play();
 									levelDone = true;
 									Vector2 gravity = new Vector2(0, 0);
 									bBobine.setType(BodyType.StaticBody);
@@ -407,14 +421,13 @@ public class Level5 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
 		// ---
+		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
+		mScene.attachChild(buttonRestart);
+		
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
-
-		buttonRestart = new Sprite(10, 10, this.buttonRestartTextureRegion,
-				this.getVertexBufferObjectManager());
-		mScene.attachChild(buttonRestart);
 
 		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
@@ -539,36 +552,35 @@ public class Level5 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-
-				// play level
+				
+				
+				//play level and after restart
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
-						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
+					&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
 					if (pSceneTouchEvent.getY() > 40
 							&& pSceneTouchEvent.getY() < 120) {
+						if(!levelPlayed){
 						Vector2 gravity = new Vector2(0,
 								SensorManager.GRAVITY_EARTH);
 						this.mPhysicsWorld.setGravity(gravity);
-						bBobine.setType(BodyType.DynamicBody);
 						mScene.detachChild(buttonPlay);
+						bBobine.setType(BodyType.DynamicBody);
+						levelPlayed=true;
+						}
+						else{ //to restart
+							Intent intent = getIntent();
+							finish();
+							startActivity(intent);
+						}
 					}
 				}
 
-				// restart level
-				if (pSceneTouchEvent.getX() > 10
-						&& pSceneTouchEvent.getX() < 82) {
-					if (pSceneTouchEvent.getY() > 10
-							&& pSceneTouchEvent.getY() < 82) {
-						Intent intent = getIntent();
-						finish();
-						startActivity(intent);
-					}
-				} else {
-					if (pSceneTouchEvent.getX() < 400) {
+				if (pSceneTouchEvent.getX() < 400) {
 						Log.d("myFlags", "X is " + bBobine.getPosition().x
 								+ " and Y is " + bBobine.getPosition().y);
 						// bSeatMp.setAngularVelocity(100f);
 					}
-				}
+				
 				// Log.d("myFlags", "X is " + pSceneTouchEvent.getX()
 				// + " and Y is " + pSceneTouchEvent.getY());
 				// Log.d("myFlags", "Bob coord : " + bBobine.getPosition().x +
