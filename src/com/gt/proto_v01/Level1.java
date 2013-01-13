@@ -38,10 +38,12 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
@@ -217,7 +219,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 									Vector2 gravity = new Vector2(0, 0);
 									bBobine.setType(BodyType.StaticBody);
 									mPhysicsWorld.setGravity(gravity);
-									
+									mScene.detachChild(buttonRestart);
 								}
 							}
 						}
@@ -365,9 +367,9 @@ public class Level1 extends SimpleBaseGameActivity implements
 		wb3Angle = (float) 0.37;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
-		// The toast for the tuto of the first level
 		
-			String msg= "Hello! Welcome to Cinematics.";
+		// The toast for the tuto of the first level	
+			/*String msg= "Hello! Welcome to Cinematics.";
 			gameToast(msg);
 		
 			String msg2= "Move the items from the bottom of the sreen to help the film spool go in the projector";
@@ -380,6 +382,16 @@ public class Level1 extends SimpleBaseGameActivity implements
 		
 			String msg4= "When you're done, click on the play button";
 			gameToastUp(msg4);
+		*/
+		
+		//The alert dialog for the tuto
+			this.runOnUiThread(new Runnable() {
+			    @Override
+			    public void run() {
+			        showDialog(1);
+			    }
+			});
+		
 		
 		return this.mScene;
 	}
@@ -442,6 +454,9 @@ public class Level1 extends SimpleBaseGameActivity implements
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
 							levelPlayed=true;
+							}
+							else if(levelDone){
+								//if the level is done, no action is needed
 							}
 							else{ //to restart
 								Intent intent = getIntent();
@@ -516,10 +531,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 		}
 
 		return false;
-		
-		
 	}
-
+	
 	@Override
 	public void onAccelerationAccuracyChanged(
 			final AccelerationData pAccelerationData) {
@@ -595,4 +608,37 @@ public class Level1 extends SimpleBaseGameActivity implements
   			System.out.println("Lauch of Level FAILED");
   		}
   	}
+  	
+  	@Override
+  	protected Dialog onCreateDialog(int id) {
+  	    switch (id) {
+  	    case 1:
+  	    	AlertDialog.Builder builder = new AlertDialog.Builder(Level1.this);
+  	        builder.setTitle("Hello! Welcome to Cinematics.");
+  	        builder.setMessage("Move the items from the bottom of the sreen to help the film spool go in the projector. \nClick on the center of an item to move it. \nClick on the bottom right corner to rotate it. \nWhen you're done, click on the play button");
+  	        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+  	           public void onClick(DialogInterface dialog, int id) {
+  	               // User clicked OK button
+  	           }
+  	       });
+  	         AlertDialog alert = builder.create();
+  	        return alert;
+  	  case 2:
+	    	AlertDialog.Builder builder2 = new AlertDialog.Builder(Level1.this);
+	        builder2.setTitle("My Title 2");
+	        builder2.setMessage("Hello 2");
+	        builder2.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	               // User clicked OK button
+	           }
+	       });
+	         AlertDialog alert2 = builder2.create();
+	        return alert2;
+  	    default:
+  	        return null;
+  	    }       
+  	}
+  	
 }
+
+
