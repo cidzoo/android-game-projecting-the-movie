@@ -38,10 +38,12 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
@@ -90,7 +92,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
 	boolean levelPlayed=false;
-	
+
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 
@@ -188,6 +190,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			mVictoireSound.setVolume((float) 0.3);
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -209,13 +212,14 @@ public class Level1 extends SimpleBaseGameActivity implements
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
-										&& bBobine.getPosition().y > 12) {
+										&& bBobine.getPosition().y > 12) { //LEVEL DONE!!!!
 									mScene.attachChild(success);
 									Level1.this.mVictoireSound.play();
 									levelDone = true;
 									Vector2 gravity = new Vector2(0, 0);
 									bBobine.setType(BodyType.StaticBody);
 									mPhysicsWorld.setGravity(gravity);
+									mScene.detachChild(buttonRestart);
 								}
 							}
 						}
@@ -311,24 +315,6 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.mScene.attachChild(asBobine);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
-		// ---
-		// final AnimatedSprite asButtonPlay;
-		// final Body bButtonPlay;
-		// asButtonPlay = new AnimatedSprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay,
-		// this.getVertexBufferObjectManager());
-		// // face.setScale(MathUtils.random(0.5f, 1.25f));
-		// bButtonPlay = PhysicsFactory.createCircleBody(this.mPhysicsWorld,
-		// asButtonPlay,
-		// BodyType.StaticBody, objectFixtureDef);
-		// this.mScene.attachChild(asButtonPlay);
-		// this.mPhysicsWorld.registerPhysicsConnector(new
-		// PhysicsConnector(asButtonPlay,
-		// bButtonPlay, true, true));
-
-		// final Sprite buttonPlay = new Sprite(CAMERA_WIDTH-50, 50,
-		// this.buttonPlay, this.getVertexBufferObjectManager());
-		// mScene.attachChild(buttonPlay);
 		
 		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
@@ -341,7 +327,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 		
 		
 
-		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
+		success = new Sprite(CAMERA_WIDTH / 2 - 128, CAMERA_HEIGHT / 2 - 128,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
 
 		// *********************
@@ -381,18 +367,31 @@ public class Level1 extends SimpleBaseGameActivity implements
 		wb3Angle = (float) 0.37;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
-		String msg= "Hello! Welcome to the game.";
-		gameToast(msg);
 		
+		// The toast for the tuto of the first level	
+			/*String msg= "Hello! Welcome to Cinematics.";
+			gameToast(msg);
 		
+			String msg2= "Move the items from the bottom of the sreen to help the film spool go in the projector";
+			gameToastDown(msg2);
+			gameToastDown(msg2);
 		
-		String msg2= "To play, click on the play button, on the top-right corner of the screen";
-		gameToastUp(msg2);
+			String msg3= "Click on the center of an item to move it. Click on the bottom right corner to rotate it";
+			gameToast(msg3);
+			gameToast(msg3);
 		
-
-		String msg3= "Move the items from the bottom of the sreen to help the BOBINE go in the PROJECTOR";
-		gameToastDown(msg3);
-
+			String msg4= "When you're done, click on the play button";
+			gameToastUp(msg4);
+		*/
+		
+		//The alert dialog for the tuto
+			this.runOnUiThread(new Runnable() {
+			    @Override
+			    public void run() {
+			        showDialog(1);
+			    }
+			});
+		
 		
 		return this.mScene;
 	}
@@ -456,6 +455,9 @@ public class Level1 extends SimpleBaseGameActivity implements
 							mScene.detachChild(buttonPlay);
 							levelPlayed=true;
 							}
+							else if(levelDone){
+								//if the level is done, no action is needed
+							}
 							else{ //to restart
 								Intent intent = getIntent();
 								finish();
@@ -463,6 +465,16 @@ public class Level1 extends SimpleBaseGameActivity implements
 							}
 						}
 					}
+					
+					// when the level is finished, touch the clap to continue
+					else if(levelDone && pSceneTouchEvent.getX() > CAMERA_WIDTH/2 - 128
+							&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
+						if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
+								&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
+							startNextLevel();
+						}
+					}
+					
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove()) {
@@ -520,7 +532,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 		return false;
 	}
-
+	
 	@Override
 	public void onAccelerationAccuracyChanged(
 			final AccelerationData pAccelerationData) {
@@ -583,4 +595,50 @@ public class Level1 extends SimpleBaseGameActivity implements
         });
     }
 	
+  //Method to launch the the next level
+  	public void startNextLevel(){
+  		Intent intent;
+  		try {
+  			//creating the name of the class to be launched
+  			Class<?> classe = Class.forName("com.gt.proto_v01.Level" + 2);
+  			intent = new Intent(Level1.this, classe);
+  			startActivity(intent);
+  		} catch (ClassNotFoundException e) {
+  			e.printStackTrace();
+  			System.out.println("Lauch of Level FAILED");
+  		}
+  	}
+  	
+  	@Override
+  	protected Dialog onCreateDialog(int id) {
+  	    switch (id) {
+  	    case 1:
+  	    	AlertDialog.Builder builder = new AlertDialog.Builder(Level1.this);
+  	        builder.setTitle("Hello! Welcome to Cinematics.");
+  	        builder.setMessage("Move the items from the bottom of the sreen to help the film spool go in the projector. \nClick on the center of an item to move it. \nClick on the bottom right corner to rotate it. \nWhen you're done, click on the play button");
+  	        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+  	           public void onClick(DialogInterface dialog, int id) {
+  	               // User clicked OK button
+  	           }
+  	       });
+  	         AlertDialog alert = builder.create();
+  	        return alert;
+  	  case 2:
+	    	AlertDialog.Builder builder2 = new AlertDialog.Builder(Level1.this);
+	        builder2.setTitle("My Title 2");
+	        builder2.setMessage("Hello 2");
+	        builder2.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	           public void onClick(DialogInterface dialog, int id) {
+	               // User clicked OK button
+	           }
+	       });
+	         AlertDialog alert2 = builder2.create();
+	        return alert2;
+  	    default:
+  	        return null;
+  	    }       
+  	}
+  	
 }
+
+
