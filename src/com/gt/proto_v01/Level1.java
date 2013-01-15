@@ -65,12 +65,13 @@ public class Level1 extends SimpleBaseGameActivity implements
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
 	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
 
-	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
-	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
-			successTextureRegion;
+	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture,
+			successTexture;
+	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion,
+			projTextureRegion, successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
-	
+
 	private Sound mVictoireSound;
 
 	Sprite buttonPlay, success, buttonRestart;
@@ -86,23 +87,25 @@ public class Level1 extends SimpleBaseGameActivity implements
 	boolean levelDone = false;
 
 	float yOnTouchDown = 0;
+	float xOnTouchDown = 0;
 
 	boolean wasOnRotatePointWb1 = false;
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
-	boolean levelPlayed=false;
+	boolean levelPlayed = false;
 
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 
-		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
-                new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
-        engineOptions.getAudioOptions().setNeedsSound(true);
-        
-        return engineOptions; 
+		EngineOptions engineOptions = new EngineOptions(true,
+				ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(
+						CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+		engineOptions.getAudioOptions().setNeedsSound(true);
+
+		return engineOptions;
 	}
 
 	@Override
@@ -119,7 +122,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 			this.buttonPlayTexture.load();
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
-			
+
 			// Button Restart
 			this.buttonRestartTexture = new BitmapTexture(
 					this.getTextureManager(), new IInputStreamOpener() {
@@ -186,10 +189,11 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.woodboardBitmapTextureAtlas.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
-		
+
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
-			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			this.mVictoireSound = SoundFactory.createSoundFromAsset(
+					this.mEngine.getSoundManager(), this, "victoire.ogg");
 			mVictoireSound.setVolume((float) 0.3);
 		} catch (final IOException e) {
 			Debug.e(e);
@@ -212,7 +216,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
-										&& bBobine.getPosition().y > 12) { //LEVEL DONE!!!!
+										&& bBobine.getPosition().y > 12) { // LEVEL
+																			// DONE!!!!
 									mScene.attachChild(success);
 									Level1.this.mVictoireSound.play();
 									levelDone = true;
@@ -299,7 +304,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
-		
+
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
@@ -315,17 +320,16 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.mScene.attachChild(asBobine);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
-		
-		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
+
+		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,
+				this.buttonRestartTextureRegion,
+				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
-		
-		
+
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
-		
-		
 
 		success = new Sprite(CAMERA_WIDTH / 2 - 128, CAMERA_HEIGHT / 2 - 128,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
@@ -345,7 +349,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 		// wb1Angle = (float) 0.17;
 		// bWb1.setTransform(bWb1.getPosition(), wb1Angle);
 
-		asWb2 = new AnimatedSprite(250, CAMERA_HEIGHT - 30, this.woodboardTextureRegion,
+		asWb2 = new AnimatedSprite(250, CAMERA_HEIGHT - 30,
+				this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb2,
@@ -353,8 +358,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.mScene.attachChild(asWb2);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb2,
 				bWb2, true, true));
-//		wb2Angle = (float) 0.17;
-//		bWb2.setTransform(bWb2.getPosition(), wb2Angle);
+		// wb2Angle = (float) 0.17;
+		// bWb2.setTransform(bWb2.getPosition(), wb2Angle);
 
 		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
@@ -366,33 +371,32 @@ public class Level1 extends SimpleBaseGameActivity implements
 				bWb3, true, true));
 		wb3Angle = (float) 0.37;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
-		
-		
-		// The toast for the tuto of the first level	
-			/*String msg= "Hello! Welcome to Cinematics.";
-			gameToast(msg);
-		
-			String msg2= "Move the items from the bottom of the sreen to help the film spool go in the projector";
-			gameToastDown(msg2);
-			gameToastDown(msg2);
-		
-			String msg3= "Click on the center of an item to move it. Click on the bottom right corner to rotate it";
-			gameToast(msg3);
-			gameToast(msg3);
-		
-			String msg4= "When you're done, click on the play button";
-			gameToastUp(msg4);
-		*/
-		
-		//The alert dialog for the tuto
-			this.runOnUiThread(new Runnable() {
-			    @Override
-			    public void run() {
-			        showDialog(1);
-			    }
-			});
-		
-		
+
+		// The toast for the tuto of the first level
+		/*
+		 * String msg= "Hello! Welcome to Cinematics."; gameToast(msg);
+		 * 
+		 * String msg2=
+		 * "Move the items from the bottom of the sreen to help the film spool go in the projector"
+		 * ; gameToastDown(msg2); gameToastDown(msg2);
+		 * 
+		 * String msg3=
+		 * "Click on the center of an item to move it. Click on the bottom right corner to rotate it"
+		 * ; gameToast(msg3); gameToast(msg3);
+		 * 
+		 * String msg4= "When you're done, click on the play button";
+		 * gameToastUp(msg4);
+		 */
+
+		// The alert dialog for the tuto
+		this.runOnUiThread(new Runnable() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void run() {
+				showDialog(1);
+			}
+		});
+
 		return this.mScene;
 	}
 
@@ -402,15 +406,26 @@ public class Level1 extends SimpleBaseGameActivity implements
 		if (this.mPhysicsWorld != null) {
 			if (pSceneTouchEvent.isActionDown()) {
 				float x, y, xW, yW;
+
+				float positionX = (asWb1.getX() + asWb1.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+				float positionY = (asWb1.getY() + asWb1.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+
 				x = asWb1.getX();
 				y = asWb1.getY();
 				xW = asWb1.getWidth();
 				yW = asWb1.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX + 20
+						&& pSceneTouchEvent.getX() > positionX - 30) {
+					if (pSceneTouchEvent.getY() > positionY - 20
+							&& pSceneTouchEvent.getY() < positionY + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb1 = true;
 					}
 				} else {
@@ -422,15 +437,25 @@ public class Level1 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
+				float positionX2 = (asWb2.getX() + asWb2.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb2.getRotation()))
+								* asWb2.getWidth() / 2);
+				float positionY2 = (asWb2.getY() + asWb2.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb2.getRotation()))
+								* asWb2.getWidth() / 2);
+
 				x = asWb2.getX();
 				y = asWb2.getY();
 				xW = asWb2.getWidth();
 				yW = asWb2.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX2 + 20
+						&& pSceneTouchEvent.getX() > positionX2 - 30) {
+					if (pSceneTouchEvent.getY() > positionY2 - 20
+							&& pSceneTouchEvent.getY() < positionY2 + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb2 = true;
 					}
 				} else {
@@ -442,83 +467,84 @@ public class Level1 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-				
-				//play level and after restart
-					if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
+
+				// play level and after restart
+				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
-						if (pSceneTouchEvent.getY() > 40
-								&& pSceneTouchEvent.getY() < 120) {
-							if(!levelPlayed){
+					if (pSceneTouchEvent.getY() > 40
+							&& pSceneTouchEvent.getY() < 120) {
+						if (!levelPlayed) {
 							Vector2 gravity = new Vector2(0,
 									SensorManager.GRAVITY_EARTH);
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
-							levelPlayed=true;
-							}
-							else if(levelDone){
-								//if the level is done, no action is needed
-							}
-							else{ //to restart
-								Intent intent = getIntent();
-								finish();
-								startActivity(intent);
-							}
+							levelPlayed = true;
+						} else { // to restart
+							Intent intent = getIntent();
+							finish();
+							startActivity(intent);
 						}
 					}
-					
-					// when the level is finished, touch the clap to continue
-					else if(levelDone && pSceneTouchEvent.getX() > CAMERA_WIDTH/2 - 128
-							&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
-						if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
-								&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
-							startNextLevel();
-						}
-					}
-					
+				}
+
 				return true;
 			} else {
-				if (pSceneTouchEvent.isActionMove()) {
-					float angle = 0;
-					float x, y, xW, yW;
-					x = asWb1.getX();
-					y = asWb1.getY();
-					xW = asWb1.getWidth();
-					yW = asWb1.getHeight();
-					if (wasOnMovePointWb1){
-							bWb1.setTransform(
-									pSceneTouchEvent.getX()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									pSceneTouchEvent.getY()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									bWb1.getAngle());
-						
+				if (pSceneTouchEvent.isActionMove() && !levelPlayed) {
+					if (wasOnMovePointWb1) {
+						bWb1.setTransform(
+								pSceneTouchEvent.getX()
+										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+								pSceneTouchEvent.getY()
+										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+								bWb1.getAngle());
+
 					} else {
 
 						if (wasOnRotatePointWb1) {
-							angle = pSceneTouchEvent.getY() - yOnTouchDown;
-							bWb1.setTransform(bWb1.getPosition(), angle / 100);
+							float pValueX = pSceneTouchEvent.getX();
+							float pValueY = CAMERA_HEIGHT
+									- pSceneTouchEvent.getY();
 
-						}
-						else{
-							if (wasOnMovePointWb2){
+							float directionX = pValueX - asWb1.getX();
+							float directionY = (CAMERA_HEIGHT - pValueY)
+									- asWb1.getY();
+
+							float rotationAngle = (float) Math.atan2(
+									directionY, directionX);
+
+							bWb1.setTransform(bWb1.getPosition(), rotationAngle);
+
+						} else {
+							if (wasOnMovePointWb2) {
 								bWb2.setTransform(
 										pSceneTouchEvent.getX()
 												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										pSceneTouchEvent.getY()
 												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										bWb2.getAngle());
-							
-						} else {
 
-							if (wasOnRotatePointWb2) {
-								angle = pSceneTouchEvent.getY() - yOnTouchDown;
-								bWb2.setTransform(bWb2.getPosition(), angle / 100);
+							} else {
 
+								if (wasOnRotatePointWb2) {
+									float pValueX = pSceneTouchEvent.getX();
+									float pValueY = CAMERA_HEIGHT
+											- pSceneTouchEvent.getY();
+
+									float directionX = pValueX - asWb2.getX();
+									float directionY = (CAMERA_HEIGHT - pValueY)
+											- asWb2.getY();
+
+									float rotationAngle = (float) Math.atan2(
+											directionY, directionX);
+
+									bWb2.setTransform(bWb2.getPosition(),
+											rotationAngle);
+
+								}
 							}
 						}
-						}
 					}
-					
+
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;
@@ -532,7 +558,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 		return false;
 	}
-	
+
 	@Override
 	public void onAccelerationAccuracyChanged(
 			final AccelerationData pAccelerationData) {
@@ -541,7 +567,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onAccelerationChanged(final AccelerationData pAccelerationData) {
-		
+
 	}
 
 	@Override
@@ -557,87 +583,106 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 		this.disableAccelerationSensor();
 	}
+
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
-	
-	//Method for generating Toast messages as they need to run on UI thread
-    public void gameToast(final String msg) {
-    this.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-        	Toast toast= Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG);
-        	toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER, 0, 0); //position center center of the screen
-        	toast.show();
-        }
-    });
+
+	// Method for generating Toast messages as they need to run on UI thread
+	public void gameToast(final String msg) {
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast toast = Toast.makeText(Level1.this, msg,
+						Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER, 0, 0); // position
+																					// center
+																					// center
+																					// of
+																					// the
+																					// screen
+				toast.show();
+			}
+		});
+	}
+
+	public void gameToastUp(final String msg) {
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast toast = Toast.makeText(Level1.this, msg,
+						Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.TOP | Gravity.CENTER, 60, 0); // position
+																		// Top-right
+																		// center
+																		// of
+																		// the
+																		// screen
+				toast.show();
+			}
+		});
+	}
+
+	public void gameToastDown(final String msg) {
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast toast = Toast.makeText(Level1.this, msg,
+						Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT, 0, 120); // position
+																					// center-bottom
+																					// left
+																					// of
+																					// the
+																					// screen
+				toast.show();
+			}
+		});
+	}
+
+	// Method to launch the the next level
+	public void startNextLevel() {
+		Intent intent;
+		try {
+			// creating the name of the class to be launched
+			Class<?> classe = Class.forName("com.gt.proto_v01.Level" + 2);
+			intent = new Intent(Level1.this, classe);
+			startActivity(intent);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			System.out.println("Lauch of Level FAILED");
+		}
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case 1:
+			AlertDialog.Builder builder = new AlertDialog.Builder(Level1.this);
+			builder.setTitle("Hello! Welcome to Cinematics.");
+			builder.setMessage("Move the items from the bottom of the sreen to help the film spool go in the projector. \nClick on the center of an item to move it. \nClick on the bottom right corner to rotate it. \nWhen you're done, click on the play button");
+			builder.setPositiveButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// User clicked OK button
+						}
+					});
+			AlertDialog alert = builder.create();
+			return alert;
+		case 2:
+			AlertDialog.Builder builder2 = new AlertDialog.Builder(Level1.this);
+			builder2.setTitle("My Title 2");
+			builder2.setMessage("Hello 2");
+			builder2.setPositiveButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// User clicked OK button
+						}
+					});
+			AlertDialog alert2 = builder2.create();
+			return alert2;
+		default:
+			return null;
+		}
+	}
 }
-
-    public void gameToastUp(final String msg) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            	Toast toast= Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG);
-            	toast.setGravity(Gravity.TOP|Gravity.CENTER, 60, 0); //position Top-right center of the screen
-            	toast.show();
-            }
-        });
-    }
-    
-    public void gameToastDown(final String msg) {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            	Toast toast= Toast.makeText(Level1.this, msg, Toast.LENGTH_LONG);
-            	toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.LEFT, 0, 120); //position center-bottom left of the screen
-            	toast.show();
-            }
-        });
-    }
-	
-  //Method to launch the the next level
-  	public void startNextLevel(){
-  		Intent intent;
-  		try {
-  			//creating the name of the class to be launched
-  			Class<?> classe = Class.forName("com.gt.proto_v01.Level" + 2);
-  			intent = new Intent(Level1.this, classe);
-  			startActivity(intent);
-  		} catch (ClassNotFoundException e) {
-  			e.printStackTrace();
-  			System.out.println("Lauch of Level FAILED");
-  		}
-  	}
-  	
-  	@Override
-  	protected Dialog onCreateDialog(int id) {
-  	    switch (id) {
-  	    case 1:
-  	    	AlertDialog.Builder builder = new AlertDialog.Builder(Level1.this);
-  	        builder.setTitle("Hello! Welcome to Cinematics.");
-  	        builder.setMessage("Move the items from the bottom of the sreen to help the film spool go in the projector. \nClick on the center of an item to move it. \nClick on the bottom right corner to rotate it. \nWhen you're done, click on the play button");
-  	        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-  	           public void onClick(DialogInterface dialog, int id) {
-  	               // User clicked OK button
-  	           }
-  	       });
-  	         AlertDialog alert = builder.create();
-  	        return alert;
-  	  case 2:
-	    	AlertDialog.Builder builder2 = new AlertDialog.Builder(Level1.this);
-	        builder2.setTitle("My Title 2");
-	        builder2.setMessage("Hello 2");
-	        builder2.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	           public void onClick(DialogInterface dialog, int id) {
-	               // User clicked OK button
-	           }
-	       });
-	         AlertDialog alert2 = builder2.create();
-	        return alert2;
-  	    default:
-  	        return null;
-  	    }       
-  	}
-}
-
-

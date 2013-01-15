@@ -37,7 +37,6 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
-import org.andengine.util.math.MathUtils;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
@@ -54,12 +53,14 @@ public class Level2 extends SimpleBaseGameActivity implements
 
 	protected static final int CAMERA_WIDTH = 800;
 	protected static final int CAMERA_HEIGHT = 480;
-
+	
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
 			woodboardBitmapTextureAtlas, testPointTextureAtlas;
 
 	private Scene mScene;
 	float angle = 0;
+	float previousYangle = 0;
+	float previousXangle = 0;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
 	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion,
@@ -413,14 +414,24 @@ public class Level2 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
+				
+				float positionX2 = (asWb3.getX() + asWb3.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb3.getRotation()))
+								* asWb3.getWidth() / 2);
+				float positionY2 = (asWb3.getY() + asWb3.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb3.getRotation()))
+								* asWb3.getWidth() / 2);
+				
 				x = asWb3.getX();
 				y = asWb3.getY();
 				xW = asWb3.getWidth();
 				yW = asWb3.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX2 + 20
+						&& pSceneTouchEvent.getX() > positionX2 - 30) {
+					if (pSceneTouchEvent.getY() > positionY2 - 20
+							&& pSceneTouchEvent.getY() < positionY2 + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
 						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb2 = true;
@@ -456,7 +467,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 
 				return true;
 			} else {
-				if (pSceneTouchEvent.isActionMove()) {
+				if (pSceneTouchEvent.isActionMove() && !levelPlayed) {
 
 					if (wasOnMovePointWb1) {
 						bWb1.setTransform(
@@ -469,12 +480,16 @@ public class Level2 extends SimpleBaseGameActivity implements
 					} else {
 
 						if (wasOnRotatePointWb1) {
-							angle = pSceneTouchEvent.getY() - yOnTouchDown;
-							angle = angle + pSceneTouchEvent.getX()
-									+ xOnTouchDown;
+							float pValueX = pSceneTouchEvent.getX();
+					        float pValueY = CAMERA_HEIGHT - pSceneTouchEvent.getY();
 
-							bWb1.setTransform(bWb1.getPosition(), angle / 100);
+					        float directionX = pValueX - asWb1.getX();
+					        float directionY = (CAMERA_HEIGHT - pValueY) - asWb1.getY();
 
+					        float rotationAngle = (float) Math.atan2(directionY, directionX);
+
+					        bWb1.setTransform(bWb1.getPosition(), rotationAngle);
+							
 						} else {
 							if (wasOnMovePointWb2) {
 								bWb3.setTransform(
@@ -487,12 +502,16 @@ public class Level2 extends SimpleBaseGameActivity implements
 							} else {
 
 								if (wasOnRotatePointWb2) {
-									angle = pSceneTouchEvent.getY()
-											- yOnTouchDown;
-									angle = angle + pSceneTouchEvent.getX()
-											- xOnTouchDown;
-									bWb3.setTransform(bWb3.getPosition(),
-											angle / 100);
+									
+									float pValueX = pSceneTouchEvent.getX();
+							        float pValueY = CAMERA_HEIGHT - pSceneTouchEvent.getY();
+
+							        float directionX = pValueX - asWb3.getX();
+							        float directionY = (CAMERA_HEIGHT - pValueY) - asWb3.getY();
+
+							        float rotationAngle = (float) Math.atan2(directionY, directionX);
+
+							        bWb3.setTransform(bWb3.getPosition(), rotationAngle);
 
 								}
 							}
@@ -502,7 +521,6 @@ public class Level2 extends SimpleBaseGameActivity implements
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						if (wasOnRotatePointWb1) {
-							gameToast("" + angle);
 							// asTestPoint = new
 							// AnimatedSprite((asWb1.getX()+asWb1.getRotationCenterX())
 							// +

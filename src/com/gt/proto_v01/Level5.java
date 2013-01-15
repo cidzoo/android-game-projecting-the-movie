@@ -79,7 +79,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	 private Sound mVictoireSound;
+	private Sound mVictoireSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -94,12 +94,13 @@ public class Level5 extends SimpleBaseGameActivity implements
 	boolean levelDone = false;
 
 	float yOnTouchDown = 0;
+	float xOnTouchDown = 0;
 
 	boolean wasOnRotatePointWb1 = false;
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
-	boolean levelPlayed=false;
+	boolean levelPlayed = false;
 
 	RevoluteJoint revJoint2;
 
@@ -108,11 +109,12 @@ public class Level5 extends SimpleBaseGameActivity implements
 
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 
-		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
-                new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
-        engineOptions.getAudioOptions().setNeedsSound(true);
-        
-        return engineOptions; 
+		EngineOptions engineOptions = new EngineOptions(true,
+				ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(
+						CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+		engineOptions.getAudioOptions().setNeedsSound(true);
+
+		return engineOptions;
 	}
 
 	@Override
@@ -223,10 +225,11 @@ public class Level5 extends SimpleBaseGameActivity implements
 						"speakers.png", 0, 0, 1, 1);
 		this.speakersBitmapTextureAtlas.load();
 		// ----------------------------------------------
-		
+
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
-			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			this.mVictoireSound = SoundFactory.createSoundFromAsset(
+					this.mEngine.getSoundManager(), this, "victoire.ogg");
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -421,9 +424,11 @@ public class Level5 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
 		// ---
-		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
+		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,
+				this.buttonRestartTextureRegion,
+				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
-		
+
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
@@ -446,18 +451,15 @@ public class Level5 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb1,
 				bWb1, true, true));
 
-		asWb3 = new AnimatedSprite(CAMERA_WIDTH - 150, 250,
+		asWb3 = new AnimatedSprite(250, CAMERA_HEIGHT - 30,
 				this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
 				BodyType.StaticBody, objectFixtureDef);
-
+		this.mScene.attachChild(asWb3);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
 				bWb3, true, true));
-		// wb3Angle = (float) 0.37;
-		bWb3.setTransform(bWb3.getPosition(), 2f);
-		this.mScene.attachChild(asWb3);
 
 		// RevoluteJoint revJoint2 =
 		// (RevoluteJoint)mPhysicsWorld.createJoint(revJoint);
@@ -486,18 +488,28 @@ public class Level5 extends SimpleBaseGameActivity implements
 	public boolean onSceneTouchEvent(final Scene pScene,
 			final TouchEvent pSceneTouchEvent) {
 		if (this.mPhysicsWorld != null) {
-
 			if (pSceneTouchEvent.isActionDown()) {
 				float x, y, xW, yW;
+
+				float positionX = (asWb1.getX() + asWb1.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+				float positionY = (asWb1.getY() + asWb1.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+
 				x = asWb1.getX();
 				y = asWb1.getY();
 				xW = asWb1.getWidth();
 				yW = asWb1.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX + 20
+						&& pSceneTouchEvent.getX() > positionX - 30) {
+					if (pSceneTouchEvent.getY() > positionY - 20
+							&& pSceneTouchEvent.getY() < positionY + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb1 = true;
 					}
 				} else {
@@ -509,15 +521,26 @@ public class Level5 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
+
+				float positionX2 = (asWb3.getX() + asWb3.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb3.getRotation()))
+								* asWb3.getWidth() / 2);
+				float positionY2 = (asWb3.getY() + asWb3.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb3.getRotation()))
+								* asWb3.getWidth() / 2);
+
 				x = asWb3.getX();
 				y = asWb3.getY();
 				xW = asWb3.getWidth();
 				yW = asWb3.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX2 + 20
+						&& pSceneTouchEvent.getX() > positionX2 - 30) {
+					if (pSceneTouchEvent.getY() > positionY2 - 20
+							&& pSceneTouchEvent.getY() < positionY2 + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb2 = true;
 					}
 				} else {
@@ -529,22 +552,20 @@ public class Level5 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-				
-				
-				//play level and after restart
+
+				// play level and after restart
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
-					&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
+						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
 					if (pSceneTouchEvent.getY() > 40
 							&& pSceneTouchEvent.getY() < 120) {
-						if(!levelPlayed){
-						Vector2 gravity = new Vector2(0,
-								SensorManager.GRAVITY_EARTH);
-						this.mPhysicsWorld.setGravity(gravity);
-						mScene.detachChild(buttonPlay);
-						bBobine.setType(BodyType.DynamicBody);
-						levelPlayed=true;
-						}
-						else{ //to restart
+						if (!levelPlayed) {
+							Vector2 gravity = new Vector2(0,
+									SensorManager.GRAVITY_EARTH);
+							this.mPhysicsWorld.setGravity(gravity);
+							mScene.detachChild(buttonPlay);
+							bBobine.setType(BodyType.DynamicBody);
+							levelPlayed = true;
+						} else { // to restart
 							Intent intent = getIntent();
 							finish();
 							startActivity(intent);
@@ -553,15 +574,14 @@ public class Level5 extends SimpleBaseGameActivity implements
 				}
 
 				if (pSceneTouchEvent.getX() < 400) {
-						Log.d("myFlags", "X is " + bBobine.getPosition().x
-								+ " and Y is " + bBobine.getPosition().y);
-						// bSeatMp.setAngularVelocity(100f);
-					}
-				
+					Log.d("myFlags", "X is " + bBobine.getPosition().x
+							+ " and Y is " + bBobine.getPosition().y);
+					// bSeatMp.setAngularVelocity(100f);
+				}
+
 				return true;
 			} else {
-				if (pSceneTouchEvent.isActionMove()) {
-					float angle = 0;
+				if (pSceneTouchEvent.isActionMove() && !levelPlayed) {
 					if (wasOnMovePointWb1) {
 						bWb1.setTransform(
 								pSceneTouchEvent.getX()
@@ -573,8 +593,18 @@ public class Level5 extends SimpleBaseGameActivity implements
 					} else {
 
 						if (wasOnRotatePointWb1) {
-							angle = pSceneTouchEvent.getY() - yOnTouchDown;
-							bWb1.setTransform(bWb1.getPosition(), angle / 100);
+							float pValueX = pSceneTouchEvent.getX();
+							float pValueY = CAMERA_HEIGHT
+									- pSceneTouchEvent.getY();
+
+							float directionX = pValueX - asWb1.getX();
+							float directionY = (CAMERA_HEIGHT - pValueY)
+									- asWb1.getY();
+
+							float rotationAngle = (float) Math.atan2(
+									directionY, directionX);
+
+							bWb1.setTransform(bWb1.getPosition(), rotationAngle);
 
 						} else {
 							if (wasOnMovePointWb2) {
@@ -588,16 +618,26 @@ public class Level5 extends SimpleBaseGameActivity implements
 							} else {
 
 								if (wasOnRotatePointWb2) {
-									angle = pSceneTouchEvent.getY()
-											- yOnTouchDown;
+
+									float pValueX = pSceneTouchEvent.getX();
+									float pValueY = CAMERA_HEIGHT
+											- pSceneTouchEvent.getY();
+
+									float directionX = pValueX - asWb3.getX();
+									float directionY = (CAMERA_HEIGHT - pValueY)
+											- asWb3.getY();
+
+									float rotationAngle = (float) Math.atan2(
+											directionY, directionX);
+
 									bWb3.setTransform(bWb3.getPosition(),
-											angle / 100);
+											rotationAngle);
 
 								}
 							}
 						}
 					}
-					
+
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
 						wasOnRotatePointWb1 = false;
@@ -620,7 +660,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onAccelerationChanged(final AccelerationData pAccelerationData) {
-		
+
 	}
 
 	@Override

@@ -121,6 +121,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 	boolean levelDone = false;
 
 	float yOnTouchDown = 0;
+	float xOnTouchDown = 0;
 
 	boolean wasOnRotatePointWb1 = false;
 	boolean wasOnMovePointWb1 = false;
@@ -385,25 +386,19 @@ public class Level6 extends SimpleBaseGameActivity implements
 		asWb1 = new AnimatedSprite(50, CAMERA_HEIGHT - 30,
 				this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
-		// asWb1.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb1 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb1,
 				BodyType.KinematicBody, objectFixtureDef);
 		this.mScene.attachChild(asWb1);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb1,
 				bWb1, true, true));
-		// wb1Angle = (float) 0.17;
-		// bWb1.setTransform(bWb1.getPosition(), wb1Angle);
 
 		asWb2 = new AnimatedSprite(250, CAMERA_HEIGHT - 30, this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
-		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb2,
 				BodyType.KinematicBody, objectFixtureDef);
 		this.mScene.attachChild(asWb2);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb2,
 				bWb2, true, true));
-//		wb2Angle = (float) 0.17;
-//		bWb2.setTransform(bWb2.getPosition(), wb2Angle);
 
 		asWb3 = new AnimatedSprite(300, 50, this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
@@ -502,15 +497,26 @@ public class Level6 extends SimpleBaseGameActivity implements
 		if (this.mPhysicsWorld != null) {
 			if (pSceneTouchEvent.isActionDown()) {
 				float x, y, xW, yW;
+
+				float positionX = (asWb1.getX() + asWb1.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+				float positionY = (asWb1.getY() + asWb1.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+
 				x = asWb1.getX();
 				y = asWb1.getY();
 				xW = asWb1.getWidth();
 				yW = asWb1.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX + 20
+						&& pSceneTouchEvent.getX() > positionX - 30) {
+					if (pSceneTouchEvent.getY() > positionY - 20
+							&& pSceneTouchEvent.getY() < positionY + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb1 = true;
 					}
 				} else {
@@ -522,15 +528,26 @@ public class Level6 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
+
+				float positionX2 = (asWb2.getX() + asWb2.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb2.getRotation()))
+								* asWb2.getWidth() / 2);
+				float positionY2 = (asWb2.getY() + asWb2.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb2.getRotation()))
+								* asWb2.getWidth() / 2);
+
 				x = asWb2.getX();
 				y = asWb2.getY();
 				xW = asWb2.getWidth();
 				yW = asWb2.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX2 + 20
+						&& pSceneTouchEvent.getX() > positionX2 - 30) {
+					if (pSceneTouchEvent.getY() > positionY2 - 20
+							&& pSceneTouchEvent.getY() < positionY2 + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb2 = true;
 					}
 				} else {
@@ -565,13 +582,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 
 				return true;
 			} else {
-				if (pSceneTouchEvent.isActionMove()) {
-					float angle = 0;
-					float x, y, xW, yW;
-					x = asWb1.getX();
-					y = asWb1.getY();
-					xW = asWb1.getWidth();
-					yW = asWb1.getHeight();
+				if (pSceneTouchEvent.isActionMove() && !levelPlayed) {
 					if (wasOnMovePointWb1){
 							bWb1.setTransform(
 									pSceneTouchEvent.getX()
@@ -583,8 +594,15 @@ public class Level6 extends SimpleBaseGameActivity implements
 					} else {
 
 						if (wasOnRotatePointWb1) {
-							angle = pSceneTouchEvent.getY() - yOnTouchDown;
-							bWb1.setTransform(bWb1.getPosition(), angle / 100);
+							float pValueX = pSceneTouchEvent.getX();
+					        float pValueY = CAMERA_HEIGHT - pSceneTouchEvent.getY();
+
+					        float directionX = pValueX - asWb1.getX();
+					        float directionY = (CAMERA_HEIGHT - pValueY) - asWb1.getY();
+
+					        float rotationAngle = (float) Math.atan2(directionY, directionX);
+
+					        bWb1.setTransform(bWb1.getPosition(), rotationAngle);
 
 						}
 						else{
@@ -599,8 +617,15 @@ public class Level6 extends SimpleBaseGameActivity implements
 						} else {
 
 							if (wasOnRotatePointWb2) {
-								angle = pSceneTouchEvent.getY() - yOnTouchDown;
-								bWb2.setTransform(bWb2.getPosition(), angle / 100);
+								float pValueX = pSceneTouchEvent.getX();
+						        float pValueY = CAMERA_HEIGHT - pSceneTouchEvent.getY();
+
+						        float directionX = pValueX - asWb2.getX();
+						        float directionY = (CAMERA_HEIGHT - pValueY) - asWb2.getY();
+
+						        float rotationAngle = (float) Math.atan2(directionY, directionX);
+
+						        bWb2.setTransform(bWb2.getPosition(), rotationAngle);
 
 							}
 						}

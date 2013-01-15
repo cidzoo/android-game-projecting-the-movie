@@ -49,6 +49,7 @@ import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.hardware.SensorManager;
 import android.opengl.GLES20;
@@ -113,11 +114,12 @@ public class Level3 extends SimpleBaseGameActivity implements
     private boolean levelDone = false;
     private boolean bobineDetruite = false;
     float yOnTouchDown = 0;
+    float xOnTouchDown = 0;
     
-    boolean wasOnRotatePointWb1 = false;
-    boolean wasOnMovePointWb1 = false;
-    boolean wasOnRotatePointWb2 = false;
-    boolean wasOnMovePointWb2 = false;
+    boolean wasOnRotatePointTeleporteur1 = false;
+    boolean wasOnMovePointTeleporteur1 = false;
+    boolean wasOnRotatePointTeleporteur2 = false;
+    boolean wasOnMovePointTeleporteur2 = false;
     boolean levelPlayed=false;
 
     @Override
@@ -499,48 +501,69 @@ public class Level3 extends SimpleBaseGameActivity implements
     public boolean onSceneTouchEvent(final Scene pScene,
             final TouchEvent pSceneTouchEvent) {
         if (this.mPhysicsWorld != null) {
-            if (pSceneTouchEvent.isActionDown()) {
-                float x, y, xW, yW;
-                x = asTeleporteur1.getX();
-                y = asTeleporteur1.getY();
-                xW = asTeleporteur1.getWidth();
-                yW = asTeleporteur1.getHeight();
-                if (pSceneTouchEvent.getX() < x + xW + 20
-                        && pSceneTouchEvent.getX() > x + xW - 30) {
-                    if (pSceneTouchEvent.getY() > y - 20
-                            && pSceneTouchEvent.getY() < y + yW + 20) {
-                        yOnTouchDown = pSceneTouchEvent.getY();
-                        wasOnRotatePointWb1 = true;
-                    }
-                } else {
-                    if (pSceneTouchEvent.getX() > x + 30
-                            && pSceneTouchEvent.getX() < x + xW - 30) {
-                        if (pSceneTouchEvent.getY() > y - 20
-                                && pSceneTouchEvent.getY() < y + yW + 20) {
-                            wasOnMovePointWb1 = true;
-                        }
-                    }
-                }
-                x = asTeleporteur2.getX();
-                y = asTeleporteur2.getY();
-                xW = asTeleporteur2.getWidth();
-                yW = asTeleporteur2.getHeight();
-                if (pSceneTouchEvent.getX() < x + xW + 20
-                        && pSceneTouchEvent.getX() > x + xW - 30) {
-                    if (pSceneTouchEvent.getY() > y - 20
-                            && pSceneTouchEvent.getY() < y + yW + 20) {
-                        yOnTouchDown = pSceneTouchEvent.getY();
-                        wasOnRotatePointWb2 = true;
-                    }
-                } else {
-                    if (pSceneTouchEvent.getX() > x + 30
-                            && pSceneTouchEvent.getX() < x + xW - 30) {
-                        if (pSceneTouchEvent.getY() > y - 20
-                                && pSceneTouchEvent.getY() < y + yW + 20) {
-                            wasOnMovePointWb2 = true;
-                        }
-                    }
-                }
+        	if (pSceneTouchEvent.isActionDown()) {
+				float x, y, xW, yW;
+
+				float positionX = (asTeleporteur1.getX() + asTeleporteur1.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asTeleporteur1.getRotation()))
+								* asTeleporteur1.getWidth() / 2);
+				float positionY = (asTeleporteur1.getY() + asTeleporteur1.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asTeleporteur1.getRotation()))
+								* asTeleporteur1.getWidth() / 2);
+
+				x = asTeleporteur1.getX();
+				y = asTeleporteur1.getY();
+				xW = asTeleporteur1.getWidth();
+				yW = asTeleporteur1.getHeight();
+				if (pSceneTouchEvent.getX() < positionX + 20
+						&& pSceneTouchEvent.getX() > positionX - 30) {
+					if (pSceneTouchEvent.getY() > positionY - 20
+							&& pSceneTouchEvent.getY() < positionY + 20) {
+						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
+						wasOnRotatePointTeleporteur1 = true;
+					}
+				} else {
+					if (pSceneTouchEvent.getX() > x + 30
+							&& pSceneTouchEvent.getX() < x + xW - 30) {
+						if (pSceneTouchEvent.getY() > y - 20
+								&& pSceneTouchEvent.getY() < y + yW + 20) {
+							wasOnMovePointTeleporteur1 = true;
+						}
+					}
+				}
+				float positionX2 = (asTeleporteur2.getX() + asTeleporteur2.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asTeleporteur2.getRotation()))
+								* asTeleporteur2.getWidth() / 2);
+				float positionY2 = (asTeleporteur2.getY() + asTeleporteur2.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asTeleporteur2.getRotation()))
+								* asTeleporteur2.getWidth() / 2);
+				
+				x = asTeleporteur2.getX();
+				y = asTeleporteur2.getY();
+				xW = asTeleporteur2.getWidth();
+				yW = asTeleporteur2.getHeight();
+				if (pSceneTouchEvent.getX() < positionX2 + 20
+						&& pSceneTouchEvent.getX() > positionX2 - 30) {
+					if (pSceneTouchEvent.getY() > positionY2 - 20
+							&& pSceneTouchEvent.getY() < positionY2 + 20) {
+						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
+						wasOnRotatePointTeleporteur2 = true;
+					}
+				} else {
+					if (pSceneTouchEvent.getX() > x + 30
+							&& pSceneTouchEvent.getX() < x + xW - 30) {
+						if (pSceneTouchEvent.getY() > y - 20
+								&& pSceneTouchEvent.getY() < y + yW + 20) {
+							wasOnMovePointTeleporteur2 = true;
+						}
+					}
+				}
                 
               //play level and after restart
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
@@ -569,9 +592,8 @@ public class Level3 extends SimpleBaseGameActivity implements
                 
                 return true;
             } else {
-                if (pSceneTouchEvent.isActionMove()) {
-                    float angle = 0;
-                    if (wasOnMovePointWb1) {
+                if (pSceneTouchEvent.isActionMove() && !levelPlayed) {
+                    if (wasOnMovePointTeleporteur1) {
                         bTeleporteur1.setTransform(
                                 pSceneTouchEvent.getX()
                                 / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
@@ -581,13 +603,19 @@ public class Level3 extends SimpleBaseGameActivity implements
 
                     } else {
 
-                        if (wasOnRotatePointWb1) {
-                            angle = pSceneTouchEvent.getY() - yOnTouchDown;
-                            bTeleporteur1.setTransform(
-                                    bTeleporteur1.getPosition(), angle / 100);
+                        if (wasOnRotatePointTeleporteur1) {
+                        	float pValueX = pSceneTouchEvent.getX();
+					        float pValueY = CAMERA_HEIGHT - pSceneTouchEvent.getY();
+
+					        float directionX = pValueX - asTeleporteur1.getX();
+					        float directionY = (CAMERA_HEIGHT - pValueY) - asTeleporteur1.getY();
+
+					        float rotationAngle = (float) Math.atan2(directionY, directionX);
+
+					        bTeleporteur1.setTransform(bTeleporteur1.getPosition(), rotationAngle);
 
                         } else {
-                            if (wasOnMovePointWb2) {
+                            if (wasOnMovePointTeleporteur2) {
                                 bTeleporteur2.setTransform(
                                         pSceneTouchEvent.getX()
                                         / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
@@ -597,12 +625,16 @@ public class Level3 extends SimpleBaseGameActivity implements
 
                             } else {
 
-                                if (wasOnRotatePointWb2) {
-                                    angle = pSceneTouchEvent.getY()
-                                            - yOnTouchDown;
-                                    bTeleporteur2.setTransform(
-                                            bTeleporteur2.getPosition(),
-                                            angle / 100);
+                                if (wasOnRotatePointTeleporteur2) {
+                                	float pValueX = pSceneTouchEvent.getX();
+							        float pValueY = CAMERA_HEIGHT - pSceneTouchEvent.getY();
+
+							        float directionX = pValueX - asTeleporteur2.getX();
+							        float directionY = (CAMERA_HEIGHT - pValueY) - asTeleporteur2.getY();
+
+							        float rotationAngle = (float) Math.atan2(directionY, directionX);
+
+							        bTeleporteur2.setTransform(bTeleporteur2.getPosition(), rotationAngle);
 
                                 }
                             }
@@ -610,10 +642,10 @@ public class Level3 extends SimpleBaseGameActivity implements
                     }
                 } else {
                     if (pSceneTouchEvent.isActionUp()) {
-                        wasOnRotatePointWb1 = false;
-                        wasOnMovePointWb1 = false;
-                        wasOnRotatePointWb2 = false;
-                        wasOnMovePointWb2 = false;
+                        wasOnRotatePointTeleporteur1 = false;
+                        wasOnMovePointTeleporteur1 = false;
+                        wasOnRotatePointTeleporteur2 = false;
+                        wasOnMovePointTeleporteur2 = false;
                     }
                 }
             }
@@ -624,7 +656,8 @@ public class Level3 extends SimpleBaseGameActivity implements
 
     private ContactListener createContactListener(){
     	ContactListener contactListener = new ContactListener(){
-    		public void beginContact(Contact contact){
+    		@SuppressLint({ "FloatMath", "FloatMath" })
+			public void beginContact(Contact contact){
     			
     			final Fixture x1 = contact.getFixtureA();
     			final Fixture x2 = contact.getFixtureB();
@@ -633,9 +666,6 @@ public class Level3 extends SimpleBaseGameActivity implements
     				if(x1.getBody().getUserData().equals("teleporteur1") && x2.getBody().getUserData().equals("bobine")){
     					
     					if(asBobine.getX() > asTeleporteur1.getX() && (asBobine.getX()+asBobine.getWidth()) < (asTeleporteur1.getX()+asTeleporteur2.getWidth())){
-    						
-//    						Log.i("velocity x : ", "" + x2.getBody().getLinearVelocity().x);
-//    						Log.i("velocity y : ", "" + x2.getBody().getLinearVelocity().y);
     						
     						Level3.this.mTeleportationSound.play();
     						

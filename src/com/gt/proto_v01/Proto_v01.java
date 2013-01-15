@@ -26,7 +26,6 @@ import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.debug.Debug;
 
 import android.content.Intent;
-import android.net.NetworkInfo.DetailedState;
 import android.view.KeyEvent;
 
 
