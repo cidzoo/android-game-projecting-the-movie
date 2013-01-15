@@ -55,7 +55,8 @@ public class Level2 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 	
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas, testPointTextureAtlas;
+			woodboardBitmapTextureAtlas, woodboardBitmapTextureAtlas2,
+			testPointTextureAtlas;
 
 	private Scene mScene;
 	float angle = 0;
@@ -64,7 +65,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
 	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion,
-			testPointTextureRegion;
+		woodboardTextureRegion2, testPointTextureRegion;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture,
 			successTexture;
@@ -174,6 +175,8 @@ public class Level2 extends SimpleBaseGameActivity implements
 
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		this.woodboardBitmapTextureAtlas2 = new BitmapTextureAtlas(
+				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 		this.testPointTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 10, 10, TextureOptions.BILINEAR);
 
@@ -188,11 +191,15 @@ public class Level2 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
+		this.woodboardTextureRegion2 = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.woodboardBitmapTextureAtlas2, this,
+						"woodboard_2.png", 0, 0, 1, 1);
 		this.testPointTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.testPointTextureAtlas, this,
 						"testPoint.png", 0, 0, 1, 1);
 
 		this.woodboardBitmapTextureAtlas.load();
+		this.woodboardBitmapTextureAtlas2.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
 
@@ -352,7 +359,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 		// wb1Angle = (float) 0.17;
 		// bWb1.setTransform(bWb1.getPosition(), wb1Angle);
 
-		asWb2 = new AnimatedSprite(240, 287, this.woodboardTextureRegion,
+		asWb2 = new AnimatedSprite(240, 287, this.woodboardTextureRegion2,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb2 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb2,

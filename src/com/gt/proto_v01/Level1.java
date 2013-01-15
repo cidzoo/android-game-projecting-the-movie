@@ -58,12 +58,12 @@ public class Level1 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas, woodboardBitmapTextureAtlas2;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, woodboardTextureRegion2;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture,
 			successTexture;
@@ -173,6 +173,9 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		
+		this.woodboardBitmapTextureAtlas2 = new BitmapTextureAtlas(
+				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -185,8 +188,13 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
+		
+		this.woodboardTextureRegion2 = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.woodboardBitmapTextureAtlas2, this,
+						"woodboard_2.png", 0, 0, 1, 1);
 
 		this.woodboardBitmapTextureAtlas.load();
+		this.woodboardBitmapTextureAtlas2.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
 
@@ -361,7 +369,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 		// wb2Angle = (float) 0.17;
 		// bWb2.setTransform(bWb2.getPosition(), wb2Angle);
 
-		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion,
+		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion2,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
