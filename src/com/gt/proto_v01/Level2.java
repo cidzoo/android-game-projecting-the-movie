@@ -228,6 +228,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 									Vector2 gravity = new Vector2(0, 0);
 									bBobine.setType(BodyType.StaticBody);
 									mPhysicsWorld.setGravity(gravity);
+									mScene.detachChild(buttonRestart);
 								}
 							}
 						}
@@ -333,7 +334,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
 
-		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
+		success = new Sprite(CAMERA_WIDTH / 2 - 128, CAMERA_HEIGHT / 2 - 128,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
 
 		// *********************
@@ -457,11 +458,26 @@ public class Level2 extends SimpleBaseGameActivity implements
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
 							levelPlayed = true;
-						} else { // to restart
+							
+							
+						}else if (levelDone){
+							//if the level is done, no action is needed
+							//cannot restart the level anymore
+						}
+						else { // to restart
 							Intent intent = getIntent();
 							finish();
 							startActivity(intent);
 						}
+					}
+				}
+				
+				// when the level is finished, touch the clap to continue
+				else if(levelDone && pSceneTouchEvent.getX() > CAMERA_WIDTH/2 - 128
+						&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
+					if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
+							&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
+						startNextLevel();
 					}
 				}
 
@@ -589,4 +605,18 @@ public class Level2 extends SimpleBaseGameActivity implements
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
+	// Method to launch the the next level
+		public void startNextLevel() {
+			Intent intent;
+			try {
+				// creating the name of the class to be launched
+				Class<?> classe = Class.forName("com.gt.proto_v01.Level" + 3);
+				intent = new Intent(Level2.this, classe);
+				startActivity(intent);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				System.out.println("Lauch of Level FAILED");
+			}
+		}
+	
 }

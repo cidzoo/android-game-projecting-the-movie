@@ -372,22 +372,6 @@ public class Level1 extends SimpleBaseGameActivity implements
 		wb3Angle = (float) 0.37;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 
-		// The toast for the tuto of the first level
-		/*
-		 * String msg= "Hello! Welcome to Cinematics."; gameToast(msg);
-		 * 
-		 * String msg2=
-		 * "Move the items from the bottom of the sreen to help the film spool go in the projector"
-		 * ; gameToastDown(msg2); gameToastDown(msg2);
-		 * 
-		 * String msg3=
-		 * "Click on the center of an item to move it. Click on the bottom right corner to rotate it"
-		 * ; gameToast(msg3); gameToast(msg3);
-		 * 
-		 * String msg4= "When you're done, click on the play button";
-		 * gameToastUp(msg4);
-		 */
-
 		// The alert dialog for the tuto
 		this.runOnUiThread(new Runnable() {
 			@SuppressWarnings("deprecation")
@@ -479,14 +463,29 @@ public class Level1 extends SimpleBaseGameActivity implements
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
 							levelPlayed = true;
-						} else { // to restart
+							
+							
+						}else if (levelDone){
+							//if the level is done, no action is needed
+							//cannot restart the level anymore
+						}
+						else { // to restart
 							Intent intent = getIntent();
 							finish();
 							startActivity(intent);
 						}
 					}
 				}
-
+				
+				// when the level is finished, touch the clap to continue
+				else if(levelDone && pSceneTouchEvent.getX() > CAMERA_WIDTH/2 - 128
+						&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
+					if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
+							&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
+						startNextLevel();
+					}
+				}
+				
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove() && !levelPlayed) {
@@ -588,57 +587,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 	// Inner and Anonymous Classes
 	// ===========================================================
 
-	// Method for generating Toast messages as they need to run on UI thread
-	public void gameToast(final String msg) {
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast toast = Toast.makeText(Level1.this, msg,
-						Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER, 0, 0); // position
-																					// center
-																					// center
-																					// of
-																					// the
-																					// screen
-				toast.show();
-			}
-		});
-	}
-
-	public void gameToastUp(final String msg) {
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast toast = Toast.makeText(Level1.this, msg,
-						Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.TOP | Gravity.CENTER, 60, 0); // position
-																		// Top-right
-																		// center
-																		// of
-																		// the
-																		// screen
-				toast.show();
-			}
-		});
-	}
-
-	public void gameToastDown(final String msg) {
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast toast = Toast.makeText(Level1.this, msg,
-						Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT, 0, 120); // position
-																					// center-bottom
-																					// left
-																					// of
-																					// the
-																					// screen
-				toast.show();
-			}
-		});
-	}
+	
 
 	// Method to launch the the next level
 	public void startNextLevel() {
