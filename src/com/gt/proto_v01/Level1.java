@@ -638,7 +638,6 @@ public class Level1 extends SimpleBaseGameActivity implements
   	        return null;
   	    }       
   	}
-  	
 }
 
 
