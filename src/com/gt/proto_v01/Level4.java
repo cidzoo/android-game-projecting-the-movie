@@ -297,6 +297,9 @@ public class Level4 extends SimpleBaseGameActivity implements
 				BodyType.StaticBody, wallFixtureDef);
 
 		ground.setColor(0, 0, 0, 0);
+		roof.setColor(0, 0, 0, 0);
+		left.setColor(0, 0, 0, 0);
+		right.setColor(0, 0, 0, 0);
 		this.mScene.attachChild(ground);
 		this.mScene.attachChild(roof);
 		this.mScene.attachChild(left);

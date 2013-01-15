@@ -14,6 +14,7 @@ import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
+import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
@@ -43,8 +44,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.SensorManager;
-import android.view.Gravity;
-import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -277,6 +276,9 @@ public class Level1 extends SimpleBaseGameActivity implements
 				BodyType.StaticBody, wallFixtureDef);
 
 		ground.setColor(0, 0, 0, 0);
+		roof.setColor(0, 0, 0, 0);
+		left.setColor(0, 0, 0, 0);
+		right.setColor(0, 0, 0, 0);
 		this.mScene.attachChild(ground);
 		this.mScene.attachChild(roof);
 		this.mScene.attachChild(left);
