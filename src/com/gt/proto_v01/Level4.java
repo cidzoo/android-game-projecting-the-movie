@@ -335,7 +335,25 @@ public class Level4 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
+		final Rectangle projr3 = new Rectangle(CAMERA_WIDTH - 90,
+				CAMERA_HEIGHT - 110, 50, 50, vertexBufferObjectManager);
+		Body projb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, projr3,
+				BodyType.StaticBody,
+				PhysicsFactory.createFixtureDef(0, 0, 0.5f));
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				projr3, projb3, true, true));
+		projr3.setColor(0, 0, 0, 0);
+		this.mScene.attachChild(projr3);
 		
+		final Rectangle projr4 = new Rectangle(CAMERA_WIDTH - 70,
+				CAMERA_HEIGHT - 120, 10, 60, vertexBufferObjectManager);
+		Body projb4 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, projr4,
+				BodyType.StaticBody,
+				PhysicsFactory.createFixtureDef(0, 0, 0.5f));
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				projr4, projb4, true, true));
+		projr4.setColor(0, 0, 0, 0);
+		this.mScene.attachChild(projr4);
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
