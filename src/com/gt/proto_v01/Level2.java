@@ -37,9 +37,12 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.SimpleBaseGameActivity;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 import org.andengine.util.debug.Debug;
+import org.andengine.util.math.MathUtils;
 
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -53,24 +56,27 @@ public class Level2 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas, testPointTextureAtlas;
 
 	private Scene mScene;
+	float angle = 0;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion,
+			testPointTextureRegion;
 
-	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
-	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
-			successTextureRegion;
+	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture,
+			successTexture;
+	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion,
+			projTextureRegion, successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	 private Sound mVictoireSound;
-	
+	private Sound mVictoireSound;
+
 	Sprite buttonPlay, success, buttonRestart;
 
-	AnimatedSprite asWb1, asWb2, asWb3;
+	AnimatedSprite asWb1, asWb2, asWb3, asTestPoint;
 	Body bWb1, bWb2, bWb3;
 	float xWb1, xWb2, xWb3, yWb1, yWb2, yWb3;
 	float wb1Angle, wb2Angle, wb3Angle;
@@ -81,23 +87,25 @@ public class Level2 extends SimpleBaseGameActivity implements
 	boolean levelDone = false;
 
 	float yOnTouchDown = 0;
+	float xOnTouchDown = 0;
 
 	boolean wasOnRotatePointWb1 = false;
 	boolean wasOnMovePointWb1 = false;
 	boolean wasOnRotatePointWb2 = false;
 	boolean wasOnMovePointWb2 = false;
-	boolean levelPlayed=false;
-	
+	boolean levelPlayed = false;
+
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 
 		final Camera camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		
-		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
-                new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
-        engineOptions.getAudioOptions().setNeedsSound(true);
-        
-        return engineOptions; 
+
+		EngineOptions engineOptions = new EngineOptions(true,
+				ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(
+						CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+		engineOptions.getAudioOptions().setNeedsSound(true);
+
+		return engineOptions;
 	}
 
 	@Override
@@ -114,19 +122,19 @@ public class Level2 extends SimpleBaseGameActivity implements
 			this.buttonPlayTexture.load();
 			this.buttonPlayTextureRegion = TextureRegionFactory
 					.extractFromTexture(this.buttonPlayTexture);
-			
-			// Button Restart
-						this.buttonRestartTexture = new BitmapTexture(
-								this.getTextureManager(), new IInputStreamOpener() {
-									@Override
-									public InputStream open() throws IOException {
-										return getAssets().open("gfx/button_restart.png");
-									}
-								});
 
-						this.buttonRestartTexture.load();
-						this.buttonRestartTextureRegion = TextureRegionFactory
-								.extractFromTexture(this.buttonRestartTexture);
+			// Button Restart
+			this.buttonRestartTexture = new BitmapTexture(
+					this.getTextureManager(), new IInputStreamOpener() {
+						@Override
+						public InputStream open() throws IOException {
+							return getAssets().open("gfx/button_restart.png");
+						}
+					});
+
+			this.buttonRestartTexture.load();
+			this.buttonRestartTextureRegion = TextureRegionFactory
+					.extractFromTexture(this.buttonRestartTexture);
 			// ----
 			this.projTexture = new BitmapTexture(this.getTextureManager(),
 					new IInputStreamOpener() {
@@ -165,6 +173,8 @@ public class Level2 extends SimpleBaseGameActivity implements
 
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		this.testPointTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 10, 10, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -177,14 +187,18 @@ public class Level2 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
+		this.testPointTextureRegion = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.testPointTextureAtlas, this,
+						"testPoint.png", 0, 0, 1, 1);
 
 		this.woodboardBitmapTextureAtlas.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
-		
+
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
-			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			this.mVictoireSound = SoundFactory.createSoundFromAsset(
+					this.mEngine.getSoundManager(), this, "victoire.ogg");
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -292,7 +306,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
-		
+
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
@@ -308,14 +322,15 @@ public class Level2 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 				asBobine, bBobine, true, true));
 		// ---
-		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
+		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,
+				this.buttonRestartTextureRegion,
+				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
-		
+
 		buttonPlay = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonPlayTextureRegion,
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
-		
 
 		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
@@ -346,7 +361,8 @@ public class Level2 extends SimpleBaseGameActivity implements
 		wb2Angle = 0.6f;
 		bWb2.setAngularVelocity(wb2Angle);
 
-		asWb3 = new AnimatedSprite(250, CAMERA_HEIGHT - 30, this.woodboardTextureRegion,
+		asWb3 = new AnimatedSprite(250, CAMERA_HEIGHT - 30,
+				this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
@@ -354,8 +370,8 @@ public class Level2 extends SimpleBaseGameActivity implements
 		this.mScene.attachChild(asWb3);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
 				bWb3, true, true));
-//		wb3Angle = (float) 0.37;
-//		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
+		// wb3Angle = (float) 0.37;
+		// bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 
 		return this.mScene;
 	}
@@ -366,15 +382,26 @@ public class Level2 extends SimpleBaseGameActivity implements
 		if (this.mPhysicsWorld != null) {
 			if (pSceneTouchEvent.isActionDown()) {
 				float x, y, xW, yW;
+
+				float positionX = (asWb1.getX() + asWb1.getRotationCenterX())
+						+ (float) (Math
+								.cos(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+				float positionY = (asWb1.getY() + asWb1.getRotationCenterY())
+						+ (float) (Math
+								.sin(Math.toRadians(asWb1.getRotation()))
+								* asWb1.getWidth() / 2);
+
 				x = asWb1.getX();
 				y = asWb1.getY();
 				xW = asWb1.getWidth();
 				yW = asWb1.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
+				if (pSceneTouchEvent.getX() < positionX + 20
+						&& pSceneTouchEvent.getX() > positionX - 30) {
+					if (pSceneTouchEvent.getY() > positionY - 20
+							&& pSceneTouchEvent.getY() < positionY + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb1 = true;
 					}
 				} else {
@@ -395,6 +422,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 					if (pSceneTouchEvent.getY() > y - 20
 							&& pSceneTouchEvent.getY() < y + yW + 20) {
 						yOnTouchDown = pSceneTouchEvent.getY();
+						xOnTouchDown = pSceneTouchEvent.getX();
 						wasOnRotatePointWb2 = true;
 					}
 				} else {
@@ -406,78 +434,113 @@ public class Level2 extends SimpleBaseGameActivity implements
 						}
 					}
 				}
-				
-				//play level and after restart
+
+				// play level and after restart
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
-					&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
+						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
 					if (pSceneTouchEvent.getY() > 40
 							&& pSceneTouchEvent.getY() < 120) {
-						if(!levelPlayed){
-						Vector2 gravity = new Vector2(0,
-								SensorManager.GRAVITY_EARTH);
-						this.mPhysicsWorld.setGravity(gravity);
-						mScene.detachChild(buttonPlay);
-						levelPlayed=true;
-						}
-						else{ //to restart
+						if (!levelPlayed) {
+							Vector2 gravity = new Vector2(0,
+									SensorManager.GRAVITY_EARTH);
+							this.mPhysicsWorld.setGravity(gravity);
+							mScene.detachChild(buttonPlay);
+							levelPlayed = true;
+						} else { // to restart
 							Intent intent = getIntent();
 							finish();
 							startActivity(intent);
 						}
 					}
 				}
-			
+
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove()) {
-					float angle = 0;
-					if (wasOnMovePointWb1){
-							bWb1.setTransform(
-									pSceneTouchEvent.getX()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									pSceneTouchEvent.getY()
-											/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-									bWb1.getAngle());
-						
+
+					if (wasOnMovePointWb1) {
+						bWb1.setTransform(
+								pSceneTouchEvent.getX()
+										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+								pSceneTouchEvent.getY()
+										/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+								bWb1.getAngle());
+
 					} else {
 
 						if (wasOnRotatePointWb1) {
 							angle = pSceneTouchEvent.getY() - yOnTouchDown;
+							angle = angle + pSceneTouchEvent.getX()
+									+ xOnTouchDown;
+
 							bWb1.setTransform(bWb1.getPosition(), angle / 100);
 
-						}
-						else{
-							if (wasOnMovePointWb2){
+						} else {
+							if (wasOnMovePointWb2) {
 								bWb3.setTransform(
 										pSceneTouchEvent.getX()
 												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										pSceneTouchEvent.getY()
 												/ PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT,
 										bWb3.getAngle());
-							
-						} else {
 
-							if (wasOnRotatePointWb2) {
-								angle = pSceneTouchEvent.getY() - yOnTouchDown;
-								bWb3.setTransform(bWb3.getPosition(), angle / 100);
+							} else {
 
+								if (wasOnRotatePointWb2) {
+									angle = pSceneTouchEvent.getY()
+											- yOnTouchDown;
+									angle = angle + pSceneTouchEvent.getX()
+											- xOnTouchDown;
+									bWb3.setTransform(bWb3.getPosition(),
+											angle / 100);
+
+								}
 							}
 						}
-						}
 					}
-					
+
 				} else {
 					if (pSceneTouchEvent.isActionUp()) {
+						if (wasOnRotatePointWb1) {
+							gameToast("" + angle);
+							// asTestPoint = new
+							// AnimatedSprite((asWb1.getX()+asWb1.getRotationCenterX())
+							// +
+							// (float)(Math.cos(Math.toRadians(asWb1.getRotation()))*asWb1.getWidth()/2),
+							// (asWb1.getY()+asWb1.getRotationCenterY()) +
+							// (float)(Math.sin(Math.toRadians(asWb1.getRotation()))*asWb1.getWidth()/2),
+							// testPointTextureRegion,
+							// getVertexBufferObjectManager());
+							// mScene.attachChild(asTestPoint);
+						}
 						wasOnRotatePointWb1 = false;
 						wasOnMovePointWb1 = false;
 						wasOnRotatePointWb2 = false;
 						wasOnMovePointWb2 = false;
+
 					}
 				}
 			}
 		}
 
 		return false;
+	}
+
+	public void gameToast(final String msg) {
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast toast = Toast.makeText(Level2.this, msg,
+						Toast.LENGTH_SHORT);
+				toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER, 0, 0); // position
+																					// center
+																					// center
+																					// of
+																					// the
+																					// screen
+				toast.show();
+			}
+		});
 	}
 
 	@Override
@@ -488,7 +551,7 @@ public class Level2 extends SimpleBaseGameActivity implements
 
 	@Override
 	public void onAccelerationChanged(final AccelerationData pAccelerationData) {
-		
+
 	}
 
 	@Override

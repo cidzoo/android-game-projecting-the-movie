@@ -230,7 +230,7 @@ public class Level3 extends SimpleBaseGameActivity implements
         this.mCircleFaceTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mBitmapTextureAtlas, this,
                 "bobine3.png", 0, 0, 1, 1); // 64x32
         this.bgTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.bgBitmapTextureAtlas, this,
-                "fond_scienceFiction.png", 0, 0, 1, 1); // 64x32
+                "fond_scienceFiction2.png", 0, 0, 1, 1); // 64x32
         this.laserTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.laserBitmapTextureAtlas, this,
                 "laser.png", 0, 0, 1, 1);
         this.dematerialiseurTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.teleporteurBitmapTextureAtlas, this,
