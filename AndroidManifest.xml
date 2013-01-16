@@ -35,7 +35,7 @@
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
-            android:name=".Level3"
+            android:name=".Level5"
             android:label="@string/title_activity_level3" 
             android:noHistory="true">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
@@ -47,7 +47,7 @@
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />
         </activity>
         <activity
-            android:name=".Level5"
+            android:name=".Level3"
             android:label="@string/title_activity_level5" 
             android:noHistory="true">
             <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.gt.proto_v01" />

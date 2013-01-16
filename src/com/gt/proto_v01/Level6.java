@@ -119,6 +119,8 @@ public class Level6 extends SimpleBaseGameActivity implements
 	Sprite spriteDernierFragment;
 
 	boolean levelDone = false;
+	
+	Rectangle bgSucess;
 
 	float yOnTouchDown = 0;
 	float xOnTouchDown = 0;
@@ -265,12 +267,14 @@ public class Level6 extends SimpleBaseGameActivity implements
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
 										&& bBobine.getPosition().y > 12) {
+									mScene.attachChild(bgSucess);
 									mScene.attachChild(success);
 									Level6.this.mVictoireSound.play();
 									levelDone = true;
 									//Vector2 gravity = new Vector2(0, 0);
 									bBobine.setType(BodyType.StaticBody);
 									//mPhysicsWorld.setGravity(gravity);
+									mScene.detachChild(buttonRestart);
 								}
 							}
 						}
@@ -284,6 +288,10 @@ public class Level6 extends SimpleBaseGameActivity implements
 				45, vertexBufferObjectManager);
 		inventory.setColor(0.2f, 0.2f, 0.2f, 0.5f);
 		this.mScene.attachChild(inventory);
+		
+		bgSucess = new Rectangle(0, 0, 800,
+				480, vertexBufferObjectManager);
+		bgSucess.setColor(0.0f, 0.0f, 0.0f, 0.6f);
 
 		Sprite bgSprite = new Sprite(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT,
 				bgTextureRegion, this.getVertexBufferObjectManager());
@@ -316,6 +324,9 @@ public class Level6 extends SimpleBaseGameActivity implements
 				BodyType.StaticBody, wallFixtureDef);
 
 		ground.setColor(0, 0, 0, 0);
+		roof.setColor(0, 0, 0, 0);
+		left.setColor(0, 0, 0, 0);
+		right.setColor(0, 0, 0, 0);
 		this.mScene.attachChild(ground);
 		this.mScene.attachChild(roof);
 		this.mScene.attachChild(left);
@@ -351,7 +362,25 @@ public class Level6 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
+		final Rectangle projr3 = new Rectangle(CAMERA_WIDTH - 90,
+				CAMERA_HEIGHT - 110, 50, 50, vertexBufferObjectManager);
+		Body projb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, projr3,
+				BodyType.StaticBody,
+				PhysicsFactory.createFixtureDef(0, 0, 0.5f));
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				projr3, projb3, true, true));
+		projr3.setColor(0, 0, 0, 0);
+		this.mScene.attachChild(projr3);
 		
+		final Rectangle projr4 = new Rectangle(CAMERA_WIDTH - 70,
+				CAMERA_HEIGHT - 120, 10, 60, vertexBufferObjectManager);
+		Body projb4 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, projr4,
+				BodyType.StaticBody,
+				PhysicsFactory.createFixtureDef(0, 0, 0.5f));
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				projr4, projb4, true, true));
+		projr4.setColor(0, 0, 0, 0);
+		this.mScene.attachChild(projr4);
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
@@ -377,7 +406,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 				this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonPlay);
 		
-		success = new Sprite(CAMERA_WIDTH / 2 - 70, CAMERA_HEIGHT / 2 - 70,
+		success = new Sprite(CAMERA_WIDTH / 2 - 128, CAMERA_HEIGHT / 2 - 128,
 				this.successTextureRegion, this.getVertexBufferObjectManager());
 
 		// *********************
@@ -560,23 +589,37 @@ public class Level6 extends SimpleBaseGameActivity implements
 					}
 				}
 				
-				//play level and after restart
+				// play level and after restart
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
-					&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
+						&& pSceneTouchEvent.getX() < CAMERA_WIDTH - 40) {
 					if (pSceneTouchEvent.getY() > 40
 							&& pSceneTouchEvent.getY() < 120) {
-						if(!levelPlayed){
-						Vector2 gravity = new Vector2(0,
-								SensorManager.GRAVITY_EARTH);
-						this.mPhysicsWorld.setGravity(gravity);
-						mScene.detachChild(buttonPlay);
-						levelPlayed=true;
+						if (!levelPlayed) {
+							Vector2 gravity = new Vector2(0,
+									SensorManager.GRAVITY_EARTH);
+							this.mPhysicsWorld.setGravity(gravity);
+							mScene.detachChild(buttonPlay);
+							levelPlayed = true;
+							
+							
+						}else if (levelDone){
+							//if the level is done, no action is needed
+							//cannot restart the level anymore
 						}
-						else{ //to restart
+						else { // to restart
 							Intent intent = getIntent();
 							finish();
 							startActivity(intent);
 						}
+					}
+				}
+				
+				// when the level is finished, touch the clap to continue
+				else if(levelDone && pSceneTouchEvent.getX() > CAMERA_WIDTH/2 - 128
+						&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
+					if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
+							&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
+						//startNextLevel(); NOT IMPLEMENTED COZ THIS IS THE LAST LEVEL
 					}
 				}
 

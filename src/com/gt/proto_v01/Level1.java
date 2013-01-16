@@ -14,6 +14,7 @@ import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
+import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
@@ -43,8 +44,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.SensorManager;
-import android.view.Gravity;
-import android.widget.Toast;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -58,12 +57,12 @@ public class Level1 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas, woodboardBitmapTextureAtlas2;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, woodboardTextureRegion2;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture,
 			successTexture;
@@ -85,6 +84,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 	Body bBobine;
 
 	boolean levelDone = false;
+	
+	Rectangle bgSucess;
 
 	float yOnTouchDown = 0;
 	float xOnTouchDown = 0;
@@ -173,6 +174,9 @@ public class Level1 extends SimpleBaseGameActivity implements
 
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		
+		this.woodboardBitmapTextureAtlas2 = new BitmapTextureAtlas(
+				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 
 		// --------
 
@@ -185,8 +189,13 @@ public class Level1 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
+		
+		this.woodboardTextureRegion2 = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.woodboardBitmapTextureAtlas2, this,
+						"woodboard_2.png", 0, 0, 1, 1);
 
 		this.woodboardBitmapTextureAtlas.load();
+		this.woodboardBitmapTextureAtlas2.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
 
@@ -217,7 +226,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
 										&& bBobine.getPosition().y > 12) { // LEVEL
-																			// DONE!!!!
+									mScene.attachChild(bgSucess);			// DONE!!!!
 									mScene.attachChild(success);
 									Level1.this.mVictoireSound.play();
 									levelDone = true;
@@ -238,6 +247,10 @@ public class Level1 extends SimpleBaseGameActivity implements
 				45, vertexBufferObjectManager);
 		inventory.setColor(0.2f, 0.2f, 0.2f, 0.5f);
 		this.mScene.attachChild(inventory);
+		
+		bgSucess = new Rectangle(0, 0, 800,
+				480, vertexBufferObjectManager);
+		bgSucess.setColor(0.0f, 0.0f, 0.0f, 0.6f);
 
 		Sprite bgSprite = new Sprite(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT,
 				bgTextureRegion, this.getVertexBufferObjectManager());
@@ -269,6 +282,9 @@ public class Level1 extends SimpleBaseGameActivity implements
 				BodyType.StaticBody, wallFixtureDef);
 
 		ground.setColor(0, 0, 0, 0);
+		roof.setColor(0, 0, 0, 0);
+		left.setColor(0, 0, 0, 0);
+		right.setColor(0, 0, 0, 0);
 		this.mScene.attachChild(ground);
 		this.mScene.attachChild(roof);
 		this.mScene.attachChild(left);
@@ -304,7 +320,25 @@ public class Level1 extends SimpleBaseGameActivity implements
 		projr2.setColor(0, 0, 0, 0);
 		projb2.setTransform(projb2.getPosition(), (float) 1.57);
 		this.mScene.attachChild(projr2);
-
+		final Rectangle projr3 = new Rectangle(CAMERA_WIDTH - 90,
+				CAMERA_HEIGHT - 110, 50, 50, vertexBufferObjectManager);
+		Body projb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, projr3,
+				BodyType.StaticBody,
+				PhysicsFactory.createFixtureDef(0, 0, 0.5f));
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				projr3, projb3, true, true));
+		projr3.setColor(0, 0, 0, 0);
+		this.mScene.attachChild(projr3);
+		
+		final Rectangle projr4 = new Rectangle(CAMERA_WIDTH - 70,
+				CAMERA_HEIGHT - 120, 10, 60, vertexBufferObjectManager);
+		Body projb4 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, projr4,
+				BodyType.StaticBody,
+				PhysicsFactory.createFixtureDef(0, 0, 0.5f));
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+				projr4, projb4, true, true));
+		projr4.setColor(0, 0, 0, 0);
+		this.mScene.attachChild(projr4);
 		// **********************
 		// *** BOBINE *** //
 		final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(1,
@@ -361,7 +395,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 		// wb2Angle = (float) 0.17;
 		// bWb2.setTransform(bWb2.getPosition(), wb2Angle);
 
-		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion,
+		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion2,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
@@ -371,22 +405,6 @@ public class Level1 extends SimpleBaseGameActivity implements
 				bWb3, true, true));
 		wb3Angle = (float) 0.37;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
-
-		// The toast for the tuto of the first level
-		/*
-		 * String msg= "Hello! Welcome to Cinematics."; gameToast(msg);
-		 * 
-		 * String msg2=
-		 * "Move the items from the bottom of the sreen to help the film spool go in the projector"
-		 * ; gameToastDown(msg2); gameToastDown(msg2);
-		 * 
-		 * String msg3=
-		 * "Click on the center of an item to move it. Click on the bottom right corner to rotate it"
-		 * ; gameToast(msg3); gameToast(msg3);
-		 * 
-		 * String msg4= "When you're done, click on the play button";
-		 * gameToastUp(msg4);
-		 */
 
 		// The alert dialog for the tuto
 		this.runOnUiThread(new Runnable() {
@@ -479,14 +497,29 @@ public class Level1 extends SimpleBaseGameActivity implements
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
 							levelPlayed = true;
-						} else { // to restart
+							
+							
+						}else if (levelDone){
+							//if the level is done, no action is needed
+							//cannot restart the level anymore
+						}
+						else { // to restart
 							Intent intent = getIntent();
 							finish();
 							startActivity(intent);
 						}
 					}
 				}
-
+				
+				// when the level is finished, touch the clap to continue
+				else if(levelDone && pSceneTouchEvent.getX() > CAMERA_WIDTH/2 - 128
+						&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
+					if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
+							&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
+						startNextLevel();
+					}
+				}
+				
 				return true;
 			} else {
 				if (pSceneTouchEvent.isActionMove() && !levelPlayed) {
@@ -588,57 +621,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 	// Inner and Anonymous Classes
 	// ===========================================================
 
-	// Method for generating Toast messages as they need to run on UI thread
-	public void gameToast(final String msg) {
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast toast = Toast.makeText(Level1.this, msg,
-						Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER, 0, 0); // position
-																					// center
-																					// center
-																					// of
-																					// the
-																					// screen
-				toast.show();
-			}
-		});
-	}
-
-	public void gameToastUp(final String msg) {
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast toast = Toast.makeText(Level1.this, msg,
-						Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.TOP | Gravity.CENTER, 60, 0); // position
-																		// Top-right
-																		// center
-																		// of
-																		// the
-																		// screen
-				toast.show();
-			}
-		});
-	}
-
-	public void gameToastDown(final String msg) {
-		this.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Toast toast = Toast.makeText(Level1.this, msg,
-						Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER_VERTICAL | Gravity.LEFT, 0, 120); // position
-																					// center-bottom
-																					// left
-																					// of
-																					// the
-																					// screen
-				toast.show();
-			}
-		});
-	}
+	
 
 	// Method to launch the the next level
 	public void startNextLevel() {
