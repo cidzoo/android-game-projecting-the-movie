@@ -84,6 +84,8 @@ public class Level1 extends SimpleBaseGameActivity implements
 	Body bBobine;
 
 	boolean levelDone = false;
+	
+	Rectangle bgSucess;
 
 	float yOnTouchDown = 0;
 	float xOnTouchDown = 0;
@@ -224,7 +226,7 @@ public class Level1 extends SimpleBaseGameActivity implements
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
 										&& bBobine.getPosition().y > 12) { // LEVEL
-																			// DONE!!!!
+									mScene.attachChild(bgSucess);			// DONE!!!!
 									mScene.attachChild(success);
 									Level1.this.mVictoireSound.play();
 									levelDone = true;
@@ -245,6 +247,10 @@ public class Level1 extends SimpleBaseGameActivity implements
 				45, vertexBufferObjectManager);
 		inventory.setColor(0.2f, 0.2f, 0.2f, 0.5f);
 		this.mScene.attachChild(inventory);
+		
+		bgSucess = new Rectangle(0, 0, 800,
+				480, vertexBufferObjectManager);
+		bgSucess.setColor(0.0f, 0.0f, 0.0f, 0.6f);
 
 		Sprite bgSprite = new Sprite(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT,
 				bgTextureRegion, this.getVertexBufferObjectManager());
