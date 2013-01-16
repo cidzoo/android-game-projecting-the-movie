@@ -467,10 +467,10 @@ public class Level6 extends SimpleBaseGameActivity implements
 	    chainLinkDef.initialize(chainLinkBody1, chainLinkBody2, chainLinkBody2.getWorldCenter());
 	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF PREVIOUS BODY
 	    // USUALLY EQUALS PREVIOUS BODY LENGTH
-	    chainLinkDef.localAnchorA.set(0.0f, ((bodyHeight/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
+	    chainLinkDef.localAnchorA.set(0.0f, ((bodyHeight/2) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
 	    // NEXT IS DISTANCE OF ANCHOR AWAY FROM CENTER OF THIS BODY
 	    // USUALLY EQUALS THIS BODY LENGTH
-	    chainLinkDef.localAnchorB.set(0.0f, -((bodyHeight/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
+	    //chainLinkDef.localAnchorB.set(0.0f, -((bodyHeight/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
 	    chainLinkDef.enableMotor = false;
 	    chainLinkDef.motorSpeed = 0;
 	    chainLinkDef.enableLimit = false;
