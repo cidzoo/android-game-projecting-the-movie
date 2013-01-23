@@ -262,7 +262,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 				new ITimerCallback() {
 					@Override
 					public void onTimePassed(final TimerHandler pTimerHandler) {
-						if (!levelDone) {
+						if (levelPlayed && !levelDone) {
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
@@ -395,8 +395,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 		bBobine.setUserData("bobine");
 
 		this.mScene.attachChild(asBobine);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
-				asBobine, bBobine, true, true));
+		
 		// ---
 		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
@@ -599,6 +598,8 @@ public class Level6 extends SimpleBaseGameActivity implements
 									SensorManager.GRAVITY_EARTH);
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
+							this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+									asBobine, bBobine, true, true));
 							levelPlayed = true;
 							
 							
