@@ -76,7 +76,7 @@ public class Level5 extends SimpleBaseGameActivity implements
     protected static final int CAMERA_HEIGHT = 480;
     
     //private boolean needExplosion = true;
-    private Sound mExplosionSound, mTeleportationSound, mVictoireSound, mHitVentSound;
+    private Sound mExplosionSound, mTeleportationSound, mVictoireSound, mHitBobineSound;
     
     private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
             laserBitmapTextureAtlas, teleporteurBitmapTextureAtlas,
@@ -251,7 +251,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 		try {
 			this.mExplosionSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "explosion.mp3");
 			this.mTeleportationSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "teleportation.ogg");
-			this.mHitVentSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
+			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
 		} catch (final IOException e) {
 			Debug.e(e);

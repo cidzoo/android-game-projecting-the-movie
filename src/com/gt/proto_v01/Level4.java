@@ -73,7 +73,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	 private Sound mVictoireSound, mHitVentSound;
+	 private Sound mVictoireSound, mHitBobineSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -204,7 +204,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
-			this.mHitVentSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
+			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -441,9 +441,9 @@ public class Level4 extends SimpleBaseGameActivity implements
 				if(pContact.getFixtureA().equals(asWb1));
 	            {
 	            	
-	            	if(!mHitVentSound.isReleased()){
-	            		mHitVentSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
-	            		mHitVentSound.play();
+	            	if(!mHitBobineSound.isReleased()){
+	            		mHitBobineSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
+	            		mHitBobineSound.play();
 	            	}
 	            }
 			}
