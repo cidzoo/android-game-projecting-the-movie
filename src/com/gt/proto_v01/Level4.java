@@ -60,15 +60,15 @@ public class Level4 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas, ventBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas,  woodboardBitmapTextureAtlas2, ventBitmapTextureAtlas;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, ventTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, woodboardTextureRegion2, ventTextureRegion;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
-	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
+	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion,  projTextureRegion,
 			successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
@@ -174,8 +174,9 @@ public class Level4 extends SimpleBaseGameActivity implements
 				this.getTextureManager(), 64, 64, TextureOptions.BILINEAR);
 		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
-
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		this.woodboardBitmapTextureAtlas2 = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 		
 		this.ventBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),75 , 121, TextureOptions.BILINEAR);
@@ -191,11 +192,14 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
-	
+		this.woodboardTextureRegion2 = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.woodboardBitmapTextureAtlas2, this,
+						"woodboard_2.png", 0, 0, 1, 1);
 		this.ventTextureRegion = BitmapTextureAtlasTextureRegionFactory.
 				createTiledFromAsset(this.ventBitmapTextureAtlas, this, "ventON.png",0,0,1,1);
 
 		this.woodboardBitmapTextureAtlas.load();
+		this.woodboardBitmapTextureAtlas2.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
 		
@@ -233,6 +237,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
 										&& bBobine.getPosition().y > 12) {
+									mFanSound.stop();
 									mScene.attachChild(bgSucess);
 									mScene.attachChild(success);
 									Level4.this.mVictoireSound.play();
@@ -412,7 +417,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb2,
 				bWb2, true, true));
 
-		asWb3 = new AnimatedSprite(529, 370, this.woodboardTextureRegion,
+		asWb3 = new AnimatedSprite(529, 370, this.woodboardTextureRegion2,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
@@ -595,7 +600,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
 					if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
 							&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
-						mFanSound.stop();
 						startNextLevel();
 					}
 				}
