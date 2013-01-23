@@ -44,6 +44,10 @@ import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
@@ -79,7 +83,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	private Sound mVictoireSound;
+	private Sound mVictoireSound, mHitVentSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -232,6 +236,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(
 					this.mEngine.getSoundManager(), this, "victoire.ogg");
+			this.mHitVentSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -511,6 +516,43 @@ public class Level3 extends SimpleBaseGameActivity implements
 		// *****************//
 
 		return this.mScene;
+	}
+	
+	@Override
+	public synchronized void onGameCreated() {
+		this.mPhysicsWorld.setContactListener(new ContactListener(){
+
+			@Override 
+			public void beginContact(final Contact pContact) {
+				if(pContact.getFixtureA().equals(asWb1));
+	            {
+	            	
+	            	if(!mHitVentSound.isReleased()){
+	            		mHitVentSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
+	            		mHitVentSound.play();
+	            	}
+	            }
+			}
+
+			@Override
+			public void endContact(Contact contact) {
+				
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        });
+		super.onGameCreated();
 	}
 
 	@Override

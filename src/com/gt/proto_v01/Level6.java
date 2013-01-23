@@ -104,7 +104,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 	
 	private Joint ropeJoin;
 	
-	 private Sound mVictoireSound;
+	 private Sound mVictoireSound, mHitVentSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -243,6 +243,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			this.mHitVentSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -517,6 +518,43 @@ public class Level6 extends SimpleBaseGameActivity implements
 	    // USUALLY EQUALS THIS BODY LENGTH
 	    chainLinkDef2.localAnchorB.set(0.0f, -((hauteurBody/4) / PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT));
 	    ropeJoin = mPhysicsWorld.createJoint(chainLinkDef2);
+	}
+	
+	@Override
+	public synchronized void onGameCreated() {
+		this.mPhysicsWorld.setContactListener(new ContactListener(){
+
+			@Override 
+			public void beginContact(final Contact pContact) {
+				if(pContact.getFixtureA().equals(asWb1));
+	            {
+	            	
+	            	if(!mHitVentSound.isReleased()){
+	            		mHitVentSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
+	            		mHitVentSound.play();
+	            	}
+	            }
+			}
+
+			@Override
+			public void endContact(Contact contact) {
+				
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        });
+		super.onGameCreated();
 	}
 
 	@Override

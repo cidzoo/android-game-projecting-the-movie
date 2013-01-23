@@ -438,7 +438,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 			@Override 
 			public void beginContact(final Contact pContact) {
-				if(pContact.getFixtureA().equals(asVent));
+				if(pContact.getFixtureA().equals(asWb1));
 	            {
 	            	
 	            	if(!mHitVentSound.isReleased()){
