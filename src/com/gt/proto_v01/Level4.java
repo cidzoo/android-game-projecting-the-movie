@@ -73,7 +73,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	 private Sound mVictoireSound, mHitBobineSound;
+	 private Sound mVictoireSound, mHitBobineSound, mFanSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -204,7 +204,11 @@ public class Level4 extends SimpleBaseGameActivity implements
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			mVictoireSound.setVolume((float) 0.3);
 			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
+			this.mFanSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "fan.ogg");
+			mFanSound.setVolume((float) 0.1);
+			this.mFanSound.setLooping(true);
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -246,7 +250,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 									bVent.getLocalPoint(bBobine.getPosition()).x < 10 &&
 									bVent.getLocalPoint(bBobine.getPosition()).y > -asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2  &&
 									bVent.getLocalPoint(bBobine.getPosition()).y < asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2 ){
-								float impulse = 7f-bVent.getLocalPoint(bBobine.getPosition()).x;
+								float impulse = 9f-bVent.getLocalPoint(bBobine.getPosition()).x;
 										
 								if(impulse<0) impulse=0f;
 								
@@ -408,25 +412,25 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb2,
 				bWb2, true, true));
 
-		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion,
+		asWb3 = new AnimatedSprite(529, 370, this.woodboardTextureRegion,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
 				BodyType.KinematicBody, objectFixtureDef);
 		this.mScene.attachChild(asWb3);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
-				bWb3, true, true));
-		wb3Angle = (float) 0.15;
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3, bWb3, true, true));
+		wb3Angle = (float) 1.6;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
 		// *************************
 		// ****** VENTILATOR *******
 		//**************************
 		
-		asVent = new AnimatedSprite(10, CAMERA_HEIGHT - 130, this.ventTextureRegion, this.getVertexBufferObjectManager());
-		bVent = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asVent, BodyType.KinematicBody, objectFixtureDef);
+		asVent = new AnimatedSprite(500, CAMERA_HEIGHT - 70, this.ventTextureRegion, this.getVertexBufferObjectManager());
+		bVent = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asVent, BodyType.StaticBody, objectFixtureDef);
 		this.mScene.attachChild(asVent);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asVent, bVent, true, true));
+		bVent.setTransform(bVent.getPosition(), (float)-1.5);
 		
 		
 		return this.mScene;
@@ -572,7 +576,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 							this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 									asBobine, bBobine, true, true));
 							levelPlayed = true;
-							
+							mFanSound.play();
 							
 						}else if (levelDone){
 							//if the level is done, no action is needed
@@ -591,6 +595,7 @@ public class Level4 extends SimpleBaseGameActivity implements
 						&& pSceneTouchEvent.getX() < CAMERA_WIDTH/2 + 128){
 					if (pSceneTouchEvent.getY() > CAMERA_HEIGHT/2 -128
 							&& pSceneTouchEvent.getY() < CAMERA_HEIGHT/2 + 128) {
+						mFanSound.stop();
 						startNextLevel();
 					}
 				}

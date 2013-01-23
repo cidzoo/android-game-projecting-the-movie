@@ -64,11 +64,6 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
-//===========================================================
-// Level3.java - Projet Game Tech - HES-SO Master
-// 
-// Niveau de Valentin (démo téléporteur)
-// ===========================================================
 public class Level5 extends SimpleBaseGameActivity implements
         IAccelerationListener, IOnSceneTouchListener {
 
@@ -253,6 +248,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 			this.mTeleportationSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "teleportation.ogg");
 			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			mVictoireSound.setVolume((float) 0.3);
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
