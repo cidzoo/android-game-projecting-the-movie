@@ -255,13 +255,11 @@ public class Level4 extends SimpleBaseGameActivity implements
 									bVent.getLocalPoint(bBobine.getPosition()).x < 10 &&
 									bVent.getLocalPoint(bBobine.getPosition()).y > -asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2  &&
 									bVent.getLocalPoint(bBobine.getPosition()).y < asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2 ){
-								float impulse = 9f-bVent.getLocalPoint(bBobine.getPosition()).x;
-										
+								
+								float impulse = 10f-bVent.getLocalPoint(bBobine.getPosition()).x;									
 								if(impulse<0) impulse=0f;
-								
-								
+	
 								bBobine.applyLinearImpulse(
-										//
 										new Vector2((float) (impulse * Math.cos(bVent.getAngle())),
 												(float) (impulse * Math.sin(bVent.getAngle()))), 
 												bVent.getPosition());
@@ -547,26 +545,26 @@ public class Level4 extends SimpleBaseGameActivity implements
 					}
 				}
 				
-				x = asVent.getX();
-				y = asVent.getY();
-				xW = asVent.getWidth();
-				yW = asVent.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
-						yOnTouchDown = pSceneTouchEvent.getY();
-						wasOnRotatePointVent = true;
-					}
-				} else {
-					if (pSceneTouchEvent.getX() > x + 30
-							&& pSceneTouchEvent.getX() < x + xW - 30) {
-						if (pSceneTouchEvent.getY() > y - 20
-								&& pSceneTouchEvent.getY() < y + yW + 20) {
-							wasOnMovePointVent = true;
-						}
-					}
-				}
+//				x = asVent.getX();
+//				y = asVent.getY();
+//				xW = asVent.getWidth();
+//				yW = asVent.getHeight();
+//				if (pSceneTouchEvent.getX() < x + xW + 20
+//						&& pSceneTouchEvent.getX() > x + xW - 30) {
+//					if (pSceneTouchEvent.getY() > y - 20
+//							&& pSceneTouchEvent.getY() < y + yW + 20) {
+//						yOnTouchDown = pSceneTouchEvent.getY();
+//						wasOnRotatePointVent = true;
+//					}
+//				} else {
+//					if (pSceneTouchEvent.getX() > x + 30
+//							&& pSceneTouchEvent.getX() < x + xW - 30) {
+//						if (pSceneTouchEvent.getY() > y - 20
+//								&& pSceneTouchEvent.getY() < y + yW + 20) {
+//							wasOnMovePointVent = true;
+//						}
+//					}
+//				}
 				
 				// play level and after restart
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
