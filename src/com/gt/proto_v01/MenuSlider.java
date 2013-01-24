@@ -32,7 +32,7 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 	/**
 	 * Duration of the inertia effect
 	 */
-	protected static float INERTIA_DURATION = 0.8f;
+	protected static float INERTIA_DURATION = 1.2f;
 	/**
 	 * Multiplier applied to last move to defined inertia distance
 	 */
@@ -96,7 +96,7 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
     /**
      * Last X offset
      */
-    protected float lastMove;
+    protected float lastMove, lastLastMove;
     /**
      * Current inertia movement
      */
@@ -325,6 +325,9 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 				 
 		inertiaMove = new MoveModifier(INERTIA_DURATION,currentX,next,0,0,EaseCubicOut.getInstance());
 		container.registerEntityModifier(inertiaMove);
+		
+		if(lastMove!=lastLastMove)
+			lastLastMove=lastMove;
 	}
 
 
@@ -337,6 +340,8 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 			float pSceneX, float pSceneY) {
 		
 		Debug.d("On click item "+iItemClicked);
+		
+		if(lastMove==lastLastMove)
 			parent.startLevel(iItemClicked);
 	}
 	

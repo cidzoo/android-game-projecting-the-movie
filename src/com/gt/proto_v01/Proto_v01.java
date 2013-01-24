@@ -72,13 +72,14 @@ public class Proto_v01 extends BaseGameActivity{
 	boolean gamePaused=false;
 	
 	 private Sound menuSound;
+	 static int callCounts = 0;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions()
 	{
 		camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new FillResolutionPolicy(), camera);
-		engineOptions.getAudioOptions().setNeedsSound(true);
+		engineOptions.getAudioOptions().setNeedsSound(true).setNeedsMusic(true);
 		return engineOptions;
 	}
 
@@ -113,6 +114,14 @@ public class Proto_v01 extends BaseGameActivity{
                 splash.detachSelf();
                 mEngine.setScene(mainScene);
                 currentScene = SceneType.MAIN;
+                mainScene.registerUpdateHandler(new TimerHandler(1f, new ITimerCallback() 
+        		{
+                    public void onTimePassed(final TimerHandler pTimerHandler) 
+                    {
+                        mEngine.unregisterUpdateHandler(pTimerHandler);
+                        menuSound.play(); 
+                    }
+        		}));
             }
 		}));
   
@@ -215,7 +224,6 @@ public class Proto_v01 extends BaseGameActivity{
     	splashScene.attachChild(splash);
 	}
 
-
 	//Method to launch the level clicked in the menu
 	public void startLevel(int level){
 		Intent intent;
@@ -235,7 +243,7 @@ public class Proto_v01 extends BaseGameActivity{
 	
 	@Override
 	public void onResumeGame() {
-		super.onResumeGame();
+		callCounts++;
 		if(gamePaused){
 			
 			menuSlider = new MenuSlider(this);
@@ -251,9 +259,17 @@ public class Proto_v01 extends BaseGameActivity{
 			
 			mainScene.attachChild(menuSlider);
 			menuSlider.onShow(mainScene);
-			menuSound.play();
+		
+			try{
+				menuSound.resume();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		
+		
+
+		super.onResumeGame();
 	}
 
 	@Override
@@ -262,6 +278,6 @@ public class Proto_v01 extends BaseGameActivity{
 		menuSlider.onHide(mainScene);
 		gamePaused=true;
 		menuSlider=null;
-		menuSound.stop();
+		menuSound.pause();
 	}
 }
