@@ -205,7 +205,7 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 	 * 
 	 * @param scene (Scene) - scene where the menu is attached
 	 */
-	public void onShow(Scene scene)
+	public void onShow(Scene scene, float lastX)
 	{
 		if(scrollDetector == null)
 			scrollDetector = new SurfaceScrollDetector(this);
@@ -223,6 +223,8 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 			Sprite sprite = sprites.get(x);
 			scene.registerTouchArea(sprite);
 		}
+		
+		container.setPosition(lastX, 0);
 	}
 
 
@@ -231,7 +233,7 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 	 * 
 	 * @param scene (Scene) - scene from the menu is detached
 	 */
-	public void onHide(Scene scene)
+	public float onHide(Scene scene)
 	{
 		scrollDetector.setEnabled(false);
 		clickDetector.setEnabled(false);
@@ -247,8 +249,9 @@ public class MenuSlider extends Entity implements IScrollDetectorListener,IClick
 			container.unregisterEntityModifier(inertiaMove);
 			inertiaMove = null;		
 		}
-		currentX = 0;
-		container.setPosition(0,0);
+		return currentX + lastMove*INERTIA_COEF;
+//		currentX = 0;
+//		container.setPosition(0,0);
 	}
 	
 	// ===========================================================

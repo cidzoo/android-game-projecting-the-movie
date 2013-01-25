@@ -72,6 +72,7 @@ public class Proto_v01 extends BaseGameActivity{
 	boolean gamePaused=false;
 	
 	 private Sound menuSound;
+	private float lastX;
 	 static int callCounts = 0;
 	
 	@Override
@@ -203,7 +204,7 @@ public class Proto_v01 extends BaseGameActivity{
 		menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
 		
 		mainScene.attachChild(menuSlider);
-		menuSlider.onShow(mainScene);
+		menuSlider.onShow(mainScene, lastX);
 	}
 
 	//self-explicit ;-)
@@ -258,7 +259,7 @@ public class Proto_v01 extends BaseGameActivity{
 			menuSlider.createMenu(CAMERA_WIDTH, xOffset, yOffset, gap);
 			
 			mainScene.attachChild(menuSlider);
-			menuSlider.onShow(mainScene);
+			menuSlider.onShow(mainScene, lastX);
 		
 			try{
 				menuSound.resume();
@@ -275,7 +276,7 @@ public class Proto_v01 extends BaseGameActivity{
 	@Override
 	public void onPauseGame() {
 		super.onPauseGame();
-		menuSlider.onHide(mainScene);
+		lastX = menuSlider.onHide(mainScene);
 		gamePaused=true;
 		menuSlider=null;
 		menuSound.pause();
