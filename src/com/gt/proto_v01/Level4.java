@@ -60,20 +60,20 @@ public class Level4 extends SimpleBaseGameActivity implements
 	protected static final int CAMERA_HEIGHT = 480;
 
 	private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
-			woodboardBitmapTextureAtlas, ventBitmapTextureAtlas;
+			woodboardBitmapTextureAtlas,  woodboardBitmapTextureAtlas2, ventBitmapTextureAtlas;
 
 	private Scene mScene;
 
 	protected ITiledTextureRegion mCircleFaceTextureRegion;
-	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, ventTextureRegion;
+	protected ITiledTextureRegion bgTextureRegion, woodboardTextureRegion, woodboardTextureRegion2, ventTextureRegion;
 
 	private ITexture buttonPlayTexture, buttonRestartTexture, projTexture, successTexture;
-	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion, projTextureRegion,
+	private ITextureRegion buttonPlayTextureRegion, buttonRestartTextureRegion,  projTextureRegion,
 			successTextureRegion;
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	 private Sound mVictoireSound, mHitVentSound;
+	 private Sound mVictoireSound, mHitBobineSound, mFanSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -174,8 +174,9 @@ public class Level4 extends SimpleBaseGameActivity implements
 				this.getTextureManager(), 64, 64, TextureOptions.BILINEAR);
 		this.bgBitmapTextureAtlas = new BitmapTextureAtlas(
 				this.getTextureManager(), 800, 480, TextureOptions.BILINEAR);
-
 		this.woodboardBitmapTextureAtlas = new BitmapTextureAtlas(
+				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
+		this.woodboardBitmapTextureAtlas2 = new BitmapTextureAtlas(
 				this.getTextureManager(), 170, 10, TextureOptions.BILINEAR);
 		
 		this.ventBitmapTextureAtlas = new BitmapTextureAtlas( this.getTextureManager(),75 , 121, TextureOptions.BILINEAR);
@@ -191,11 +192,14 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.woodboardTextureRegion = BitmapTextureAtlasTextureRegionFactory
 				.createTiledFromAsset(this.woodboardBitmapTextureAtlas, this,
 						"woodboard.png", 0, 0, 1, 1);
-	
+		this.woodboardTextureRegion2 = BitmapTextureAtlasTextureRegionFactory
+				.createTiledFromAsset(this.woodboardBitmapTextureAtlas2, this,
+						"woodboard_2.png", 0, 0, 1, 1);
 		this.ventTextureRegion = BitmapTextureAtlasTextureRegionFactory.
 				createTiledFromAsset(this.ventBitmapTextureAtlas, this, "ventON.png",0,0,1,1);
 
 		this.woodboardBitmapTextureAtlas.load();
+		this.woodboardBitmapTextureAtlas2.load();
 		this.mBitmapTextureAtlas.load();
 		this.bgBitmapTextureAtlas.load();
 		
@@ -204,7 +208,11 @@ public class Level4 extends SimpleBaseGameActivity implements
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
-			this.mHitVentSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
+			mVictoireSound.setVolume((float) 0.3);
+			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
+			this.mFanSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "fan.ogg");
+			mFanSound.setVolume((float) 0.1);
+			this.mFanSound.setLooping(true);
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -222,13 +230,14 @@ public class Level4 extends SimpleBaseGameActivity implements
 				new ITimerCallback() {
 					@Override
 					public void onTimePassed(final TimerHandler pTimerHandler) {
-						if (!levelDone) {
+						if (levelPlayed && !levelDone) {
 							
 							/* test if bobine reached goal */
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
 										&& bBobine.getPosition().y > 12) {
+									mFanSound.stop();
 									mScene.attachChild(bgSucess);
 									mScene.attachChild(success);
 									Level4.this.mVictoireSound.play();
@@ -246,13 +255,11 @@ public class Level4 extends SimpleBaseGameActivity implements
 									bVent.getLocalPoint(bBobine.getPosition()).x < 10 &&
 									bVent.getLocalPoint(bBobine.getPosition()).y > -asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2  &&
 									bVent.getLocalPoint(bBobine.getPosition()).y < asVent.getHeight()/PhysicsConstants.PIXEL_TO_METER_RATIO_DEFAULT/2 ){
-								float impulse = 7f-bVent.getLocalPoint(bBobine.getPosition()).x;
-										
+								
+								float impulse = 10f-bVent.getLocalPoint(bBobine.getPosition()).x;									
 								if(impulse<0) impulse=0f;
-								
-								
+	
 								bBobine.applyLinearImpulse(
-										//
 										new Vector2((float) (impulse * Math.cos(bVent.getAngle())),
 												(float) (impulse * Math.sin(bVent.getAngle()))), 
 												bVent.getPosition());
@@ -374,8 +381,6 @@ public class Level4 extends SimpleBaseGameActivity implements
 				PhysicsFactory.createFixtureDef(1, 0, 0.5f));
 
 		this.mScene.attachChild(asBobine);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
-				asBobine, bBobine, true, true));
 		// ---
 		
 		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
@@ -410,25 +415,25 @@ public class Level4 extends SimpleBaseGameActivity implements
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb2,
 				bWb2, true, true));
 
-		asWb3 = new AnimatedSprite(410, 340, this.woodboardTextureRegion,
+		asWb3 = new AnimatedSprite(529, 370, this.woodboardTextureRegion2,
 				this.getVertexBufferObjectManager());
 		// asWb2.setScale(MathUtils.random(0.5f, 1.25f));
 		bWb3 = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asWb3,
 				BodyType.KinematicBody, objectFixtureDef);
 		this.mScene.attachChild(asWb3);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3,
-				bWb3, true, true));
-		wb3Angle = (float) 0.15;
+		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asWb3, bWb3, true, true));
+		wb3Angle = (float) 1.6;
 		bWb3.setTransform(bWb3.getPosition(), wb3Angle);
 		
 		// *************************
 		// ****** VENTILATOR *******
 		//**************************
 		
-		asVent = new AnimatedSprite(10, CAMERA_HEIGHT - 130, this.ventTextureRegion, this.getVertexBufferObjectManager());
-		bVent = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asVent, BodyType.KinematicBody, objectFixtureDef);
+		asVent = new AnimatedSprite(500, CAMERA_HEIGHT - 70, this.ventTextureRegion, this.getVertexBufferObjectManager());
+		bVent = PhysicsFactory.createBoxBody(this.mPhysicsWorld, asVent, BodyType.StaticBody, objectFixtureDef);
 		this.mScene.attachChild(asVent);
 		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(asVent, bVent, true, true));
+		bVent.setTransform(bVent.getPosition(), (float)-1.5);
 		
 		
 		return this.mScene;
@@ -440,12 +445,12 @@ public class Level4 extends SimpleBaseGameActivity implements
 
 			@Override 
 			public void beginContact(final Contact pContact) {
-				if(pContact.getFixtureA().equals(asVent));
+				if(pContact.getFixtureA().equals(asWb1));
 	            {
 	            	
-	            	if(!mHitVentSound.isReleased()){
-	            		mHitVentSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
-	            		mHitVentSound.play();
+	            	if(!mHitBobineSound.isReleased()){
+	            		mHitBobineSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
+	            		mHitBobineSound.play();
 	            	}
 	            }
 			}
@@ -540,26 +545,26 @@ public class Level4 extends SimpleBaseGameActivity implements
 					}
 				}
 				
-				x = asVent.getX();
-				y = asVent.getY();
-				xW = asVent.getWidth();
-				yW = asVent.getHeight();
-				if (pSceneTouchEvent.getX() < x + xW + 20
-						&& pSceneTouchEvent.getX() > x + xW - 30) {
-					if (pSceneTouchEvent.getY() > y - 20
-							&& pSceneTouchEvent.getY() < y + yW + 20) {
-						yOnTouchDown = pSceneTouchEvent.getY();
-						wasOnRotatePointVent = true;
-					}
-				} else {
-					if (pSceneTouchEvent.getX() > x + 30
-							&& pSceneTouchEvent.getX() < x + xW - 30) {
-						if (pSceneTouchEvent.getY() > y - 20
-								&& pSceneTouchEvent.getY() < y + yW + 20) {
-							wasOnMovePointVent = true;
-						}
-					}
-				}
+//				x = asVent.getX();
+//				y = asVent.getY();
+//				xW = asVent.getWidth();
+//				yW = asVent.getHeight();
+//				if (pSceneTouchEvent.getX() < x + xW + 20
+//						&& pSceneTouchEvent.getX() > x + xW - 30) {
+//					if (pSceneTouchEvent.getY() > y - 20
+//							&& pSceneTouchEvent.getY() < y + yW + 20) {
+//						yOnTouchDown = pSceneTouchEvent.getY();
+//						wasOnRotatePointVent = true;
+//					}
+//				} else {
+//					if (pSceneTouchEvent.getX() > x + 30
+//							&& pSceneTouchEvent.getX() < x + xW - 30) {
+//						if (pSceneTouchEvent.getY() > y - 20
+//								&& pSceneTouchEvent.getY() < y + yW + 20) {
+//							wasOnMovePointVent = true;
+//						}
+//					}
+//				}
 				
 				// play level and after restart
 				if (pSceneTouchEvent.getX() > CAMERA_WIDTH - 120
@@ -571,8 +576,10 @@ public class Level4 extends SimpleBaseGameActivity implements
 									SensorManager.GRAVITY_EARTH);
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
+							this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+									asBobine, bBobine, true, true));
 							levelPlayed = true;
-							
+							mFanSound.play();
 							
 						}else if (levelDone){
 							//if the level is done, no action is needed

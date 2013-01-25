@@ -45,7 +45,11 @@ import android.util.Log;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
@@ -79,7 +83,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 
 	protected PhysicsWorld mPhysicsWorld;
 
-	private Sound mVictoireSound;
+	private Sound mVictoireSound, mHitBobineSound, mSeatSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -232,6 +236,9 @@ public class Level3 extends SimpleBaseGameActivity implements
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(
 					this.mEngine.getSoundManager(), this, "victoire.ogg");
+			mVictoireSound.setVolume((float) 0.3);
+			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
+			this.mSeatSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "seat_clap.ogg");
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -251,7 +258,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 				new ITimerCallback() {
 					@Override
 					public void onTimePassed(final TimerHandler pTimerHandler) {
-						if (!levelDone) {
+						if (levelPlayed && !levelDone) {
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
@@ -271,6 +278,9 @@ public class Level3 extends SimpleBaseGameActivity implements
 								if (bBobine.getPosition().y < 10.40
 										&& bBobine.getPosition().y > 10) {
 									bSeatMp.setAngularVelocity(100f);
+									if(!mSeatSound.isReleased()){
+										mSeatSound.play();
+					            	}
 								}
 							}
 						}
@@ -451,8 +461,7 @@ public class Level3 extends SimpleBaseGameActivity implements
 				BodyType.DynamicBody,
 				PhysicsFactory.createFixtureDef(1, 0, 0.5f));
 		this.mScene.attachChild(asBobine);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
-				asBobine, bBobine, true, true));
+		
 		// ---
 		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,
 				this.buttonRestartTextureRegion,
@@ -512,6 +521,43 @@ public class Level3 extends SimpleBaseGameActivity implements
 		// *****************//
 
 		return this.mScene;
+	}
+	
+	@Override
+	public synchronized void onGameCreated() {
+		this.mPhysicsWorld.setContactListener(new ContactListener(){
+
+			@Override 
+			public void beginContact(final Contact pContact) {
+				if(pContact.getFixtureA().equals(asWb1));
+	            {
+	            	
+	            	if(!mHitBobineSound.isReleased()){
+	            		mHitBobineSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
+	            		mHitBobineSound.play();
+	            	}
+	            }
+			}
+
+			@Override
+			public void endContact(Contact contact) {
+				
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        });
+		super.onGameCreated();
 	}
 
 	@Override
@@ -593,6 +639,8 @@ public class Level3 extends SimpleBaseGameActivity implements
 									SensorManager.GRAVITY_EARTH);
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
+							this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+									asBobine, bBobine, true, true));
 							levelPlayed = true;
 							
 							

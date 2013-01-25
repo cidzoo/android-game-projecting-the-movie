@@ -104,7 +104,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 	
 	private Joint ropeJoin;
 	
-	 private Sound mVictoireSound;
+	 private Sound mVictoireSound, mHitBobineSound, mClapSound;
 
 	Sprite buttonPlay, success, buttonRestart;
 
@@ -243,6 +243,10 @@ public class Level6 extends SimpleBaseGameActivity implements
 		SoundFactory.setAssetBasePath("mfx/");
 		try {
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			mVictoireSound.setVolume((float) 0.3);
+			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
+			this.mClapSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "seat_clap.ogg");
+			mClapSound.setVolume((float) 0.5);
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -262,7 +266,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 				new ITimerCallback() {
 					@Override
 					public void onTimePassed(final TimerHandler pTimerHandler) {
-						if (!levelDone) {
+						if (levelPlayed && !levelDone) {
 							if (bBobine.getPosition().x < 21
 									&& bBobine.getPosition().x > 20) {
 								if (bBobine.getPosition().y < 13
@@ -301,7 +305,6 @@ public class Level6 extends SimpleBaseGameActivity implements
 		this.mScene.setOnSceneTouchListener(this);
 
 		this.mPhysicsWorld = new PhysicsWorld(new Vector2(0, 0), false);
-		this.mPhysicsWorld.setContactListener(createContactListener());
 
 		final Rectangle ground = new Rectangle(0, CAMERA_HEIGHT - 55,
 				CAMERA_WIDTH, 1, vertexBufferObjectManager);
@@ -395,8 +398,7 @@ public class Level6 extends SimpleBaseGameActivity implements
 		bBobine.setUserData("bobine");
 
 		this.mScene.attachChild(asBobine);
-		this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
-				asBobine, bBobine, true, true));
+		
 		// ---
 		buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
@@ -457,6 +459,12 @@ public class Level6 extends SimpleBaseGameActivity implements
 		return this.mScene;
 	}
 	
+	@Override
+	public synchronized void onGameCreated() {
+		this.mPhysicsWorld.setContactListener(createContactListener());
+		super.onGameCreated();
+	}
+
 	public Body makeRope(int links, float x, float y) {
 //		mPhysicsWorld.setContinuousPhysics(false);
 	    final FixtureDef objectFixtureDef = PhysicsFactory.createFixtureDef(0.7f, -1f, 1f);
@@ -599,6 +607,8 @@ public class Level6 extends SimpleBaseGameActivity implements
 									SensorManager.GRAVITY_EARTH);
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
+							this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+									asBobine, bBobine, true, true));
 							levelPlayed = true;
 							
 							
@@ -692,7 +702,8 @@ public class Level6 extends SimpleBaseGameActivity implements
 	private ContactListener createContactListener(){
     	ContactListener contactListener = new ContactListener(){
     		public void beginContact(Contact contact){
-    			
+	            
+	            /* rope */
     			final Fixture x1 = contact.getFixtureA();
     			final Fixture x2 = contact.getFixtureB();
     			
@@ -705,21 +716,34 @@ public class Level6 extends SimpleBaseGameActivity implements
 							}
 						});
         			}
-    			} if(x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
+    			} 
+    			if(x1.getBody().getUserData() != null && x2.getBody().getUserData() != null){
     				if(ropeJoin != null && x1.getBody().getUserData().equals("clap") && x2.getBody().getUserData().equals("bobine")){
     					//mScene.detachChild(asBobine);
     					runOnUpdateThread(new Runnable() {
 							public void run(){
 								mPhysicsWorld.destroyJoint(ropeJoin);
+								if(!mClapSound.isReleased()){
+									mClapSound.play();
+				            	}
 							}
 						});
         			}
     			}
+    			
+//    			/* bobine hit sound */
+//				if(contact.getFixtureA().equals(asWb1));
+//	            {
+//	            	
+//	            	if(!mHitBobineSound.isReleased()){
+//	            		mHitBobineSound.setVolume((float) 1.0 * bBobine.getLinearVelocity().len2()/10);
+//	            		mHitBobineSound.play();
+//	            	}
+//	            }
     		}
     		
     		@Override
 			public void endContact(Contact contact) {
-				// TODO Auto-generated method stub
 				
 			}
 

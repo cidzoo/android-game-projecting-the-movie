@@ -64,11 +64,6 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
-//===========================================================
-// Level3.java - Projet Game Tech - HES-SO Master
-// 
-// Niveau de Valentin (démo téléporteur)
-// ===========================================================
 public class Level5 extends SimpleBaseGameActivity implements
         IAccelerationListener, IOnSceneTouchListener {
 
@@ -76,9 +71,7 @@ public class Level5 extends SimpleBaseGameActivity implements
     protected static final int CAMERA_HEIGHT = 480;
     
     //private boolean needExplosion = true;
-    private Sound mExplosionSound;
-    private Sound mTeleportationSound;
-    private Sound mVictoireSound;
+    private Sound mExplosionSound, mTeleportationSound, mVictoireSound, mHitBobineSound;
     
     private BitmapTextureAtlas mBitmapTextureAtlas, bgBitmapTextureAtlas,
             laserBitmapTextureAtlas, teleporteurBitmapTextureAtlas,
@@ -252,20 +245,10 @@ public class Level5 extends SimpleBaseGameActivity implements
         SoundFactory.setAssetBasePath("mfx/");
 		try {
 			this.mExplosionSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "explosion.mp3");
-		} catch (final IOException e) {
-			Debug.e(e);
-		}
-		
-		SoundFactory.setAssetBasePath("mfx/");
-		try {
 			this.mTeleportationSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "teleportation.ogg");
-		} catch (final IOException e) {
-			Debug.e(e);
-		}
-		
-		SoundFactory.setAssetBasePath("mfx/");
-		try {
+			this.mHitBobineSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "metal_hit.ogg");
 			this.mVictoireSound = SoundFactory.createSoundFromAsset(this.mEngine.getSoundManager(), this, "victoire.ogg");
+			mVictoireSound.setVolume((float) 0.3);
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -290,7 +273,7 @@ public class Level5 extends SimpleBaseGameActivity implements
 
                     @Override
                     public void onTimePassed(final TimerHandler pTimerHandler) {
-                        if (!levelDone && !bobineDetruite) {
+                        if (levelPlayed && !levelDone && !bobineDetruite) {
                             if (bBobine.getPosition().x < 21
                                     && bBobine.getPosition().x > 20) {
                                 if (bBobine.getPosition().y < 13
@@ -462,8 +445,7 @@ public class Level5 extends SimpleBaseGameActivity implements
         bBobine.setUserData("bobine");
 
         this.mScene.attachChild(asBobine);
-        this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
-                asBobine, bBobine, true, true));
+        
         // ---
         buttonRestart = new Sprite(CAMERA_WIDTH - 120, 40,this.buttonRestartTextureRegion,this.getVertexBufferObjectManager());
 		mScene.attachChild(buttonRestart);
@@ -605,6 +587,8 @@ public class Level5 extends SimpleBaseGameActivity implements
 									SensorManager.GRAVITY_EARTH);
 							this.mPhysicsWorld.setGravity(gravity);
 							mScene.detachChild(buttonPlay);
+							this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
+					                asBobine, bBobine, true, true));
 							levelPlayed = true;
 							
 							
