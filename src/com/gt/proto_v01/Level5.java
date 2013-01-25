@@ -586,6 +586,10 @@ public class Level5 extends SimpleBaseGameActivity implements
 							Vector2 gravity = new Vector2(0,
 									SensorManager.GRAVITY_EARTH);
 							this.mPhysicsWorld.setGravity(gravity);
+							bBobine.setType(BodyType.DynamicBody);
+							Vector2 vector = bBobine.getLinearVelocity();
+	
+						    bBobine.setLinearVelocity(vector.x, vector.y + 20);
 							mScene.detachChild(buttonPlay);
 							this.mPhysicsWorld.registerPhysicsConnector(new PhysicsConnector(
 					                asBobine, bBobine, true, true));
